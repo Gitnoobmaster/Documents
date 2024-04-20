@@ -1,1 +1,689 @@
-Hey
+  
+  Terrafrom :- 
+  
+            
+        > Terraform is a free open source tool which is developed by harsicorp.
+        > Its is a IaC tool which is specifiaclly used to provison infrastructure.
+        > It is used to build manage and destroy infrastucture in a mintue of times.
+        > It used a HCL, which is a simple declarative language to define the infrastucture resource to be provisioned as block of codes.
+        > All infrastucure resource can be defineed within configruation files that has a .tf extention.
+        > The code is declartive and can be maintained in VCS.
+        > Terraform works in three phases.
+            Init > Terrform initialize the project and identify the providers to be used for the target environment
+            Plan > Terrform draft the plan to go the target state 
+            Apply > Terraform makes the nessesary changes required on the target enviroment to bring it to the desierd state
+
+ - HCL:-
+
+            <block> "parameter" {
+            (arrgument) key = value
+            }
+        
+       A simple terraform workflow is to
+       create a config file.
+       run the terrafrom init (to download and install the plugins for the providers used in the configuration file )
+       Review the execution plan by running terraform plan
+       and finally apply the changes by running terraform apply cmd
+
+ - Providers:-
+   
+        Three tiers of provides
+        Official Provider - owned by HarshiCorp
+        Partner Provider -
+        Community Provider - 
+
+        The pulgins are downloaded in a hidded dir caller .terraform in the working directory containing the config files
+        /root/terrform-local-file/.terraform/plugins
+
+        For Ex. plugin name
+
+        harhicorp/local
+        (hostname/Oranizationnamespace/type)
+
+
+ - Variables:- 
+
+            INPUT Variables
+
+            Variables are used to improve the reusability of our code.
+            Hard coding values is not a good idea for one. This limits the reusability of the code, which defeats the purpose of using IaC. We want to make sure that the same code can be used again and again to deploy resources based on a set of input variables that can be provided during the execution. And that is where input variables come into the picture.
+
+            code : - 
+
+            variable "variable_name" {
+                default = "Thanos.txt"
+            }
+
+            How to call this var?
+            resource "local-file" "localfile" {
+                filename = var.variable_name
+            }
+            
+            *The filename in this case will be Thanos.txt
+            *When using variables, you do not have to include the values inside double quotes
+            
+            The variable block uses three parameters
+            variable "variablename" {
+                default     = 
+                type        =
+                description = 
+            }
+            
+            Both type and description parameters are optional. But when type is used it enforces what the data type of variable is used.
+            Some basic variable data types:
+
+            string = "/root/pets.txt" 
+            number = 1
+            bool   = true/false
+            any    = Default value
+            list   = ["cat", "dog", "dog"]     
+            set    = ["cat","dog"]      #no dulplicate values
+            map    = pet1 = cat
+                     pet2 = dog
+            object = Complex Data Structure
+            tuple  = Complex Data Structure
+
+
+    -  List variable: - 
+                    A list is a numbered collection of values, and it can be defined like this
+                    In this example, we have a variable called prefix that uses a list of values.
+                            
+                            variable "prefix" {
+                                default     = ["Mr", "Mrs", "Sir"]
+                                type        = list
+                                Description = 
+                            }
+
+                    But why do we call it a numbered collection? 
+                    That is because each value, which is also known as an element, can be referenced by the number or index within that list. The index of a list always begins at zero.
+
+                            ["Mr", "Mrs", "Sir"]
+                              0      1      2
+                            
+                    In this case, the first element of the list at index zero is the word Mr
+                    The Element Index one is MRS and the final element at Index two is Sir.
+
+                    How to call this variable?
+
+                            resource "random_pet" "my-pet" {
+                                    prefix = var.prefix[0]
+                            }
+                            
+                    The prefix value would be Mr
+
+    -  Map variable:-     A map is data represented in the format of key value pairs.
+
+                            variable "variablename" {
+                                type = map
+                                default = {
+                                    "key" = "value"
+                                    "key" = "value"
+                                }  
+                            }
+                            We can specify as many key value pairs enclosed within curly braces.
+
+                            variable "filecontent" {
+                                type = map
+                                default = {
+                                    "statement1" = "We love pets"
+                                    "statement2" = "we love animals"
+                                }  
+                            }
+
+                            How to call the map variable?
+                            To access the specific valure form the map within the config file, we can make use of key matching.
+
+                            resource "local-file" "localfile" {
+                                 filename = "/root/pets.txt"
+                                 content  = var.filecontent["statement2"]
+                            }
+
+
+                We can also combine type constrains(parameters).
+                            For ex.
+                            
+                            #List of a type string
+
+                            variable "prefix" {
+                                default     = ["Mr", "Mrs", "Sir"]
+                                type        = list(string)
+                                Description = 
+                            }
+                            
+                            #List of a type number
+
+                            variable "prefix" {
+                                default     = [ 1, 2, 3]
+                                type        = list(number)
+                                Description = 
+                            }
+
+                            #Map of a type string
+
+                             variable "filecontent" {
+                                type = map(string)
+                                default = {
+                                    "statement1" = "We love pets"
+                                    "statement2" = "we love animals"
+                                }  
+                            }
+
+                            #Map of a type number
+
+                             variable "filecontent" {
+                                type = map(number)
+                                default = {
+                                    "statement1" = "1"
+                                    "statement2" = "2"
+                                }  
+                            }
+
+                            Also can be done for set and other variable same as above.
+
+    - Set variable:-     A set variable is similar to list variable. The difference is that a set cannot have duplicate elements.
+                           The default values are declared just like you would do for a list, but remember that there shouldn't be duplicate values
+                           For ex. 
+                            
+                            Worng: - 
+                            
+                            variable "prefix" {
+                                default     = ["Mr", "Mrs", "Sir", "Sir"]
+                                type        = set(string)
+                                Description = 
+                            }
+
+                            variable "prefix" {
+                                default     = [ 1, 2, 1, 3]
+                                type        = set(number)
+                                Description = 
+                            }
+                            These variable will fail as they have duplicate elements
+
+
+    - Object variable:- Using object we can create complex data structure by combining all the data types. 
+                          For ex. 
+                          
+                          variable "variablename" {
+                            type = object {
+                                name = string
+                                colour = string
+                                age    = number
+                                food   = list(string)
+                                favorite_pet = bool
+                            }
+                            default = {
+                                name = "dog"
+                                colour = "red"
+                                age   = 4
+                                food  = ["fish","turkey","chicken"]
+                                favorite_pet = true
+                            }
+                          }
+
+            Tuples variable: The tuples are simialr to a list and consists of a sequence of elements. The difference is that, list 
+                            uses elements of same variable type such as string or number. 
+                            But tuples can have different elements of different variable types.
+
+                            variable "kitty" {
+                                type = tuples([string, number, bool])
+                                default = ["cat", 7, true ]
+                            } 
+
+
+            Ways to pass the variables: 
+            1. Mention the variable and its value in the variable.tf file.
+            2. If we don't specify the any valure in the variable block it will ask for that variable value when we run terraform plan in the   
+            interactive mode.
+            3. Also we can pass the variable value while running the terraform apply cmd.
+            terraform apply -var "filename=/root/pets.txt" -var "content=we love pets"
+            4. Pass the variable using enviromrnt variables.
+                export TF_VAR_variablename="variablevalue"
+                export TF_VAR_filename="/root/pets.txt"
+                export TF_VAR_content="we love pets"
+            5. When dealing with many varaible. use the variable defination file.
+            The filename can be anything but should always end with .tfvars.
+            For Ex.
+            The filename is terraform.tfvars (autoloaded if the fliename is this)
+        
+            The content of that file is: 
+
+            filename="/root/pets.txt"
+            content="we love pets"
+
+            if the filename is different like variables.tfvars then it should be used in the cmd like
+            terraform apply -var-file /root/variables.tfvars
+
+            Terraform use varaible defination precedence which mean if you specify the variable using the cmd line it will take it as the highest priority and the variable mentioned in other ways will not be consider.
+
+ - Output Variables:-
+        
+                        Along with input variables, TerraForm also supports output variables. These variables can be used to store the
+                        value of an expression in terraform.
+
+                        The best use of output variables is when you want to quickly display details about a provision resource on the screen
+                        or to feed the output variables to other IaC tools, such as an ad hoc script or Ansible playbook for configuration management and testing.
+
+                        output "outputvariablename"{
+                            value = "variablevalue"
+                            description = 
+                        }
+
+                        
+                        resource "local_file" "pet" {
+                            filename = var.filename
+                            content = "My fav pet is ${var.content}"   
+                        }
+
+                        resource "random_pet" "my-pet" {
+                            prefix = var.prefix
+                            sperator = var.separator
+                            something = var.something
+                        }
+
+                        output "pet-name" {
+                            value = random_pet.my-pet.id
+                            description = "Record the value of the pet ID by the my_pet resource"
+                        }
+
+                        use terrform output cmd to list all the outputs defined in the config files
+                        or if you want to call out a specific output run terraform output variablename
+                        or 
+
+
+
+ - Resource Attributes:-  Reference Expressions
+
+                        In real world infrastructure provisioning process. There are bound to be multiple resources that are dependent on each other. 
+                        So what if you want to make use of the output of one resource and use it as an input for another one?
+
+                        Dependent resources can make use of reference expressions to get the output from one resource block as an input to another block.
+
+                        For below senerio, how can you use the name of the pet to get inside of the content
+                        resource "local_file" "pet" {
+                            filename = var.filename
+                            content = "My fav pet is ${var.content}"   
+                        }
+
+                        resource "random_pet" "my-pet" {
+                            prefix = var.prefix
+                            sperator = var.separator
+                            something = var.something
+                        }
+
+                        You can use of an expersion like ${resource_type.resourcename.attributename} . This is known as the interpolaton sequence.
+
+
+                        resource "local_file" "pet" {
+                            filename = var.filename
+                            content = "My fav pet is ${random_pet.my-pet.id}" 
+                        }
+
+                        resource "random_pet" "my-pet" {
+                            prefix = var.prefix
+                            sperator = var.separator
+                            something = var.something
+                        }
+
+ - Resource Dependencies -
+            By default Terrafrom uses implict dependecy which in means is it automatically detects which resource is dependened 
+            on the other resouce and create it first.
+
+            But incase you want to specify an depency explicitly, you can use an arrgument depends_on.
+            This type of dependecy is called explict dependecy.
+
+
+            resource "local_file" "pet" {
+                            filename = var.filename
+                            content = "My fav pet is ${random_pet.my-pet.id}" 
+
+                            depends_on = [
+                                random_pet.my-pet
+                            ]
+            }
+
+            resource "random_pet" "my-pet" {
+                            prefix = var.prefix
+                            sperator = var.separator
+                            something = var.something
+            }
+
+
+ - State:-
+
+        The state file is a JSON data struture that maps the real world infrastuture to the resouce defination in the configuration
+        files. It has the complete record of the infrastucture created by terraform.
+
+        When we run the plan or apply cmd, by default terraform runs the refresh of the state file which compares it againsts
+        the configuration file. 
+        
+        terraform.
+        
+
+ - Terraform commands:-
+
+
+    terraform validate  > use to validate the syntax of the config file.
+    terraform fmt       > format the code in the config file in a canonical form and to increase the redablity of config file.
+    terraform show      > shows the current state of infrasture as seen by terrform.
+    terraform providers > to list the providers used in the config file.
+    terraform providers mirror /root/terrform/new_local_file
+    terraform output    > to print the output varialbe in the config file 
+    terraform output pet-name > to print specific output variable in the config file
+    terraform refresh   > to sync the terraform with the real world infrastucture. For ex. if a resource is created outside terrform and you want
+                    that resource to be controled by terrform then you can use terrform refresh cmd and it will update the state file with the config of that resource. 
+
+    terraform graph    > Used to create a visual representation of the dependencies in a terrform configuration or execution plan.  
+
+    terraform plan --refresh=false  # When we are on the plan with this flag, you can see that our form does not refresh state.
+                                Instead, it relies on the cached attributes and in this example, the content which has changed in
+                                the configuration file.
+                                And as a result, the execution plan plots a resource replacement.
+                                The final benefit of it that we are going to look at is collaboration.
+
+
+ - Life Cycle Rules:-
+                Sometimes you may want the updated version of the resource to be created first before the older one is deleted.
+                Or you may not want the resource to be deleted at all, even if there was a change made in its local configuration.
+                This can be achieved in TerraForm by making use of life cycle rules.
+
+                create_before_destroy > create the resource first and then destory it.
+
+                resource "local_file" "pet" {
+                            filename = var.filename
+                            content = "My fav pet is ${random_pet.my-pet.id}" 
+
+                            lifecycle = {
+                                create_before_destroy = true
+                            }
+                }
+ 
+                prevent_destroy  > prevent destroy of a resource.
+
+                 resource "local_file" "pet" {
+                            filename = var.filename
+                            content = "My fav pet is ${random_pet.my-pet.id}" 
+
+                            lifecycle = {
+                                prevent_destroy = true
+                            }
+                }
+ 
+                ignore_changes  > Ignore changes to resource attributes (specific/all).
+                                  The ignore changes argument accepts a list as indicated by the square brackets and it will accept any
+                                  valid resource attribute.
+
+
+                resource "local_file" "pet" {
+                            filename = var.filename
+                            content = "My fav pet is ${random_pet.my-pet.id}" 
+
+                            lifecycle = {
+                                ignore_changes = all
+                            }
+                }
+
+                resource "local_file" "pet" {
+                            filename = var.filename
+                            content = "My fav pet is ${random_pet.my-pet.id}" 
+
+                            lifecycle = {
+                                ignore_changes = [tags, ami]
+                            }
+                }
+
+ - DataSources:-
+  
+         DataSources allow terraform to read the attributes from resources provision outside its control.
+              Use to read information from a specific resource.
+
+             resource "local_file" "pet" {
+                            filename = "/data/ped.txt"
+                            content = data.local_file.dog.content 
+             }
+
+            data "local_file" "dog" {
+                 filename = "/root/dog.txt"
+              }
+
+            * the content of file the of data resource is exposed to the attribute name content.
+
+ - Meta Arrguments: -
+    Meta arguments can be used within any resource block to change the behavior of resources.
+
+                count    = length(var.content)
+                for_each = toset(var.users)
+
+ - Version constraints:-
+
+                terraform {
+                    required_provider {
+                        local = {
+                            source  = 
+                            version = "3.4.0"  or "> 3.4.0" or "!= 3.4.0"
+                        }
+                    }
+                }
+
+ - Remote backend:-
+
+    Local state refers to Terraform state stored on the local filesystem, i.e. on your laptop or whatever system you are running the terraform command from.
+    Remote state is Terraform state stored remotely, such as in an S3 bucket or a database like PostgreSQL
+    A remote backend is remote state that can be shared, providing helpful capabilities such as preventing conflicts and inconsistencies
+
+        terraform {
+            backend "s3" {
+                bucket =
+                key    =
+                region = 
+            }
+        }
+
+
+ - Terraform state commands:-
+                        
+                        The terrafrom state file is a json file and we should not maually edit it. Terrform provides set of cmds to
+                        list pull and  manipulate state. 
+                        
+                        terraform state cmd ex.
+
+                        terraform state subcommand option arguments
+
+                        terraform state list >  It will list the resources name only within the state file
+                        terraform state show resourcename > It will show the attribute of the resource from the state file.
+                        terraform state mv oldresourcename newresourcename> use to rename a resource within state file. Make the same changes in the config file post this. 
+                                                                              Or to move the resource informaiotn from one state file to another state file.
+                        terraform state pull > Download and display the state file on screen when the state file is on remote backend.
+                        terraform state rm resource.address > use to delete items from the state file. Used when you no longer want to use a resource.
+                                                              the resource removed from state file does not remove/delete it on the real infrastuture.
+
+
+ - Providers:-
+
+        provider "aws" {
+            region =
+            secret_key =
+            access_key =
+        }
+
+ - Provisoners:-
+         Remote-exec
+
+                Provides a way for us to carry out tasks such as running commands or scripts on remote resources
+                or locally on the machine where terraform is installed, 
+                For example, to run a bash script after a resource is created we can use remote exec.
+
+                resource "aws_instance" "webserver" {
+                    ami           = amiid
+                    instance_type = t2.micro
+
+                  provisioners "remote-exec" {
+                        inline = ["sudo apt update, sudo apt install http -y"]
+                    }
+
+                    key_name = aws_key_pair.web.id                   
+                
+                }
+
+        Local-exec
+                  Run cmds/script on the local machine, not on the resources which are created by TerraForm.
+                  This is especially handy when we want to gather some data and write into a file locally.
+                  for example if you want to store the public if of the instance which is just provisioned.
+
+                resource "aws_instance" "webserver" {
+                    ami           = amiid
+                    instance_type = t2.micro 
+
+                  provisioners "local-exec" {
+                    command = "echo ${aws_instance.webserver.public_ip} >> /tmp/publicipofwebserver.txt"
+                  }
+
+
+          * By default provisoners are run after the resource is created. This is a default behaviour which is called as 
+            create time provisoner.
+            We can also run provisoner when a resource is destoryed which called 
+            destory time provisoner.
+            you can set this just by mentioning when = destory. see example below 
+
+                resource "aws_instance" "webserver" {
+                    ami           = amiid
+                    instance_type = t2.micro 
+
+                  provisioners "local-exec" {
+                    when = destory
+                    command = "echo ${aws_instance.webserver.public_ip} is destoryed! >> /tmp/publicipofwebserver.txt"
+
+                  }
+           
+            Another default behavior of provisoner is that if the command or script within the provisioner block fails
+            the terrform apply cmd also operational errors out.
+            This is also the default behavior of the provisioner, but it can also be said by specifically mentioning on failure
+            argument inside the provision of block like this.
+
+                resource "aws_instance" "webserver" {
+                    ami           = amiid
+                    instance_type = t2.micro 
+
+                  provisioners "local-exec" {
+                    onfailure = fail
+                    command = "echo ${aws_instance.webserver.public_ip} >> /temp/publicipofwebserver.txt"   #temp is wrong dir name so fails.
+                  }
+            use arrgument onfailure = fail or not, the default failue behavior is when a provisioner fail as it does in the above example
+            because the path is incorrect, terrform apply will fail and terrform will mark this resource as tainted.
+
+            For the terrform apply to not fail or mark it as tainted we can use onfailure = continue
+
+             resource "aws_instance" "webserver" {
+                    ami           = amiid
+                    instance_type = t2.micro 
+
+                  provisioners "local-exec" {
+                    onfailure = continue
+                    command = "echo ${aws_instance.webserver.public_ip} >> /temp/publicipofwebserver.txt"   #temp is wrong dir name so fails.
+                  }
+
+            now the resource will be created, even though the provisioner fails.
+
+            As a best practice, Terraform recommends to use provisioner as a last resort. Wherever possible use the native option 
+            avalaible for the resource type. 
+            For ex in case of aws we can use the user_data to provision the resource after creation. 
+            custom_data for azure.
+
+
+ - Terraform Taint and untaint : -
+
+
+                There would be cases when we want to force a particular resource to be recreated. 
+                For example, consider a case where manual changes were made to an instance which is managed by TerraForm,
+                such as changing the version of Nginx, running on it by manual methods.
+                To revert this, we can either use the terrform destory and then run apply again.
+                Or a better way is to use taint the resource using terrform taint resourcename.
+                Now when you run the terraform plan cmd you will see the resource is set to be recreated.
+
+                To undo a taint resource use the cmd terrform untaint resourcename.
+                now when you run the terrform plan the resource will not be recteated.
+
+        when we mark the resource as tainted using the taint command, it modifies the state file but does not make sure the changes are applied.
+        In a shared development environment, if another developer generates and executes a plan at this time –  the target EC2 instance will be replaced.
+        This is an unintentional change. The resource was marked as tainted by one developer but was replaced due to the apply statement executed by another developer. 
+        Starting with Terraform version 0.15.2 and onwards, the taint command is deprecated, and it is suggested to use apply command with the -replace flag.
+ 
+  Replace (-replace) - Terraform taint alternative:-
+        We recommend the -replace option because the change will be reflected in the Terraform plan, 
+        letting you understand how it will affect your infrastructure before you take any externally-visible action. 
+        When you use terraform taint, other users could create a new plan against your tainted object before you can review the effects.
+        As the name suggests, it replaces the specified resource. 
+        Its value defines the resource identifier that should be replaced with the existing configuration mentioned in the same Terraform code.
+
+
+ - Debuging: -
+            When things go wrong in TerraForm, the obvious place to look for the cause is in the logs.
+            To do this we use of an enviroment variable called TF_LOG and set it to one of the log level value 
+            INFO
+            WARNING
+            ERROR
+            DEBUG
+            TRACE
+            
+            export TF_LOG=TRACE
+
+            Now when you run the terraform cmd you will see additional detailed logs.
+
+            To store the logs persistentyl use another enviornment vaiable called TF_LOG_PATH
+            export TF_LOG_PATH=/tmp/terrformlogs.txt
+
+            To remove the logging or debugging 
+            unset TF_LOG
+            unset TF_LOG_PATH
+
+ - Terraform Import :-
+
+                There may be cases when there are resources that are created using the management console or other resources that are provision using another Iac tool, such as Ansible.
+                And what if we want to bring resources created by other methods into the control of TerraForm?
+                How do we do that?
+
+                terraform import resource_type.resource_name. attribute
+
+                using above cmd we can import resources which are not under control of terrafrom.
+                before running above cmd you should create an empty resource in your config file like below.
+
+                resource "aws_instance" "webserver-2" {
+                    # (resource arrguments)
+                }
+
+                terraform import does not make changes in the config file it only import changes to the state file. So we need to manually
+                write the config files after import is done.
+
+                Once all the arguments and the correct values have been provided, a terraform plan will refresh the state 
+                and understand that the ec2 instance already exists and will carry out no action.
+                The resource is now under the control of TerraForm.
+
+
+ - Terraform Module:-
+
+                Any configuration directory containing a set of configuration files is called a module.
+
+                module "devserver" {
+                    source = "../aws-instance"
+                }
+
+ - Functions:- 
+ - Workspace 
+            With workspaces, we can use the same configuration directory to create multiple infrastructure environments
+            such as the Project A and the Project B environment.
+            
+            to create a workspace use the below cmd
+            terraform workspace new ProjectA
+            terraform workspace list 
+            terrafrom workspace switch default.
+
+ - Dir Structure
+
+    main.tf          > Main configuration file containing resource defination.
+    variables.tf     > Contains variable declaration
+    output.tf        > Contains outputs from the resource
+    providers.tf     > Contains providers defination
+ 
+ - Common practices
+    1. Have one single cofiguration file for all the resource block required to provison the infrastructure.
+    2. Hard coding values is not a good idea for one. This limits the reusability of the code, which defeats the purpose of using IaC. We want to make sure that the same code can be used again and again to deploy resources based on a set of input variables that can be provided during the execution. And that is where input variables come into the picture
+    3. Terraform recommends to use provisioner as a last resort. Wherever possible use the native option avalaible for the resource type.Hey
