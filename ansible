@@ -1,0 +1,557 @@
+Ansible Configuration Files
+===========================
+
+  When you install ansible it creates a default Configuration file under the path /etc/ansible/ansible.cgf
+  This file governs the default behavior of ansible using set of parameters.
+
+  Please see sample default configuration file at this folder.
+
+
+  Now, we know the default location of Ansible's configuration file is at /etc/ansible/ansible.cfg path, and those are values Ansible will consider when you run the playbooks from anywhere on the controled machine
+
+
+  Specifying the config file in the playbook dir
+  ----------------------------------------------
+
+  But what if we want to have sperate configuration file for each playbook or say playbooks at different location on my hosts like one got web and other for database and network. So that we can have different configuration settings for each of them.
+
+  In this case you can make copy of the default config file and move it to the location where your playbook is present.
+  For ex.
+
+  /opt/web/
+           -  playbook.yaml
+           -  ansible.cfg
+  /opt/database/
+           -  playbook.yaml
+           -  ansible.cfg
+  /opt/network/
+           -  playbook.yaml
+           -  ansible.cfg
+
+  Now when you run the playbook, ansible will first look at your config file which are present in those dir and use it values. If it won't found one it will look for the default config file present at /etc/ansible/ansible.cfg.
+  
+  Specifying the config file with an environment variable.
+  --------------------------------------------------------
+
+
+  Now, what if you want to store you ansible.cfg file other then your playbooks dir?
+  For ex. you want to store the configuration file for /opt/web to /opt/ansible-web.cfg and use that for running ansible going forward
+  
+  You can do that so by specifing the location of the ansible configuration file through an environment variable:
+
+  ANSIBLE_CONFIG=/opt/ansible-web.cfg ansible-playbook playbook.yml
+
+  This time when ansible playbook runs it will check for this ansible config file instead of the default config file.
+
+  
+  Priority chain
+  --------------
+ 
+  But what if you have ansible config are configured in all these places with different setting? On the default location, at the playbook dir level and an environment variable pointing to a config file in different path. Which config file will ansible selects to pick value from now?
+
+  The first priority is always to the parameters configured in the file specified through the environment variable. All other config files will be overried.
+
+  Followed by the config file at the playbook dir.
+  Followed by the config file at the user home dir.
+  lastly by the config file at the default location /etc/ansible/ansible.cfg
+
+
+  NOTES: Remember, these files don't have to have all the values, you only need to override the parameter you want to override.
+        Default values then will automatically be picked form the next config file in the priority chain.
+
+
+How to override single parameter in a config file so that you can skip coping the config file at the playbook dir.
+
+You can do so by setting the environment variable right before executing the ansible playbook.
+
+
+  Trick
+  -----
+  So how do you figure out what the environment variable should be? For most options in the configuration file, you can figure out the corresponding environment variable by changing the whole parameter to uppercase and prefixing ANSIBLE_ to it, like this.
+
+  gathering  = implicit            to     ANSIBLE_GATHERING=explicit
+
+  In this case, gathering is the parameter, so it would be ANSIBLE_GATHERING in uppercase. But you must check the documentation as well to confirm that's the right one.
+
+ 
+  Use export command in linux to set the environment but remember, any value set through the environment varaible takes the hightest precedence and all other values specified in any cofiguration file will be ignored.
+
+
+  Ways to pass an environment variable.
+
+
+1. Specify in a key=value pair, right before executing the playbook
+   ANSIBLE_GATHERING=explicit ansible-playbook playbook.yaml
+   
+   This setting is only applicable for this single playbook execution, this single command.
+
+   If you want to persit this through out you shell session until you exit from your shell use:
+   export ANSIBLE_GATHERING=explicit
+   and then run your ansible-playbook
+
+   If you want to persist changes across different shells across different users running this playbook on different system then the best appoach is to create a local config file in the playbook dir. this way you can even check in the config file into your code repository.
+
+
+  View Configuration file
+  -----------------------
+
+  To view what the different configuration options are and what are all corresponding environment variables are, and what they mean.
+  Use the below cmd to see a list of configuration files, their default values, and the values you can set.
+
+  ansible-config list
+
+  How do we know which config file is active as we know we can have multiple conig files at places.
+  To see the config file that's currently active.
+
+  ansible-config view
+
+  What is you are not sure about which config file and envionment variable are being picked by the playbook.
+  This will show the comprehensive list of current settings and ansible has picked up and where it's picked that from.
+
+  ansible-config dump
+
+  This is very usefull when you are troubleshooting issues with configuration files.
+
+
+
+
+
+YAML
+====
+
+    Ansible playbooks are text files or rather configuration files that are written in YAML format.
+
+  Key Value pair:        # Remember you must have a space followed by a colon differenciating the key and the value.
+    
+    Fruit: Apple
+    Vegetable: Carrot
+    Liquid: Water
+    Meat: Chicken
+
+  Array/List:            # the dash (-) indicates that it's an element of an array.
+
+    Fruits: 
+    - Orange
+    - Apple
+    - Banana
+
+    Vegetable:
+    - Carrot
+    - Cauliflower
+    - Tamato
+
+  Dictionary/Map         # You must have a equal number of blank spaces before the properties of a single items
+
+    Banana:
+      Calories: 105
+      Fat: 0.4g
+      Carbs: 27g
+    
+    Grape:
+      Calories: 63
+      Fat: 0.3g
+      Carbs: 16g
+    
+
+  Key Value/Dictionary/Lists  #  You can list containing dictionaries containing lists. in below example we have list of fruits and elements of the lists are further dictionaries containing nutrition informaiton
+   
+   Fruits:
+     - Banana:
+        Calories: 105
+        Fat: 0.4g
+        Carbs: 27g
+     
+     - Grape: 
+        Calories: 62
+        Fat: 0.3g
+        Carbs: 16g
+
+
+  When to you dictionary vs list vs lisf of dictionaries.
+
+  To store different information of a single object we use dictionary (key: value pair)
+
+  Color: Red
+  Model: Verna
+  Trasmission: Manual
+  Price: 9L
+  
+  incase you need to split the Model to year and make we then use dictionary within another dictionary.
+
+  Color: Red
+  Model:
+    Name: Verna
+    Year: 2018
+  Transmission: Manual
+  Price: 9L
+  
+  To store multiple list of the same type of object we would use list.
+   
+  - Red Verna
+  - Blue Verna
+  - Black Verna
+
+  TO store more informaiton about the list we will modify the list to a list of dictionaries.
+ 
+  - Color: Red
+    Model:
+      Name: Verna
+      Make: 2018
+    Transmission: Manual
+    Price: 9L
+  - Color: Blue
+      Model:
+      Name: Verna
+      Make: 2018
+    Transmission: Manual
+    Price: 9L
+  - Color: Black
+      Model:
+      Name: Verna
+      Make: 2018
+    Transmission: Manual
+    Price: 9L
+ 
+
+ Dictionary is an unordered collection
+ List is an orderd collection
+
+Inventory File
+===============
+
+   The inventory file is in an INI like format. It's simply a number of servers listed, one after the other.
+   
+   Default path = /etc/ansible/hosts
+
+   Inventory file can be in two format. 
+   - INI
+   - YAML
+  
+
+Variable
+========
+
+    Variables are used to store values that varies with different items.
+    
+
+    Variables can be defined in inventory files, in playbooks, seprate variable file
+
+    How to use variable? 
+
+    hosts: all
+    vars:
+      user: 'Abhishek Bhola'
+      pass: Hello
+    tasks:
+       name: add user to servers
+       username: '{{ username.user }}'
+       password: '{{ password.pass }}'
+
+    Below is called jinja2 templating
+    >> '{{ callvaraible }}'  
+
+
+    Varaible Types:
+    
+    String Variable: Strings
+    Number Variable: Can hold numeric values or floating point values
+    Boolen Variable: Can hold ture or false values. Often used in conditional statement.
+    List variable: Can hold ordered collection. The values can be of any type. Call this variable values by it index number.
+    Dictionary variable: Can hold collection of key-value pairs. The key and value can be of any type.
+
+
+    Variable Percedence:
+
+      4 Group Variable
+      3 Host Variable
+      2 Play variable
+      1 Extra Variable
+
+    At times you may have the requirement to store the output of a task to use it later.
+
+    For ex. below playbook will display the hosts values and we will use another task to display the output of the first task.
+
+
+     hosts: all
+     tasks:
+      - name: cat the /etc/hosts file
+          shell: cat /etc/hosts
+          register: result
+      
+      - debug:
+          var: result.stdout
+
+
+      another easy way to use if you don't want to use the debug module is to use -v at the end of your ansible-playbook command.
+      ansible-playbook playbook.yaml -v 
+
+        
+
+What are the real time senerious when you were asked to create a playbook for?
+which user are being used to perform actions?
+Is there a ansible server in your organization?
+Do we really need python to be installed in client machines?
+how is the authentication happening? where is the ssh key or passowrd wrriten?
+How is the invetory file written?
+Group vars/ hosts vars
+Error Handling
+
+Configure jekins build with parameter pipeline and intergrate with Ansible
+- patch severs
+- Run a playbook to fetch the reports
+- 
+
+
+
+
+
+
+
+
+Configuration Mangement
+=======================
+                        Using configuration management tool we can configure n number of servers using one machine(configuration server)
+                        Configuration can be anything like below:
+
+                        - Creating users, groups, assinging users to groups.
+                        - Copying files and managing permission.
+                        - Start, stop and restart of services.
+                        - Installation of softwares.
+                        - Deploying an application.
+
+Ansible
+=======
+        Ansible is a open source configuration manangemet tool provided by Redhat. It is written in python language.
+        In ansible we write our configuraiton scripts in the form of Ansible playbooks. Ansible playbook is a yml/yaml
+        file which will have set of tasks which needs to be perfromed in the server.
+        Its a push based configuration management tool
+
+Main componets:
+ - Playbooks
+ - Host Inventory
+   - Static Inventory
+   - Dynamic Inventory
+- Modules
+   - Core Modules
+   - Custom Modules
+- Connection Plugins
+   - SSH
+   - WINRM
+
+
+
+
+
+1 Create a playbook to install Jenkins
+- Install Git
+- Install Java
+- install Jenkins
+- Enable service on startup
+- Start the service.
+- output the initial secret to the screen.
+- create a role out of it.
+
+
+
+
+ansible all -m ping
+ansible appServer -m ping
+ansible devServers -m ping
+ansible 10.1.1.0/hostname -m ping
+
+
+if the inventory path is different then the default.
+ansible -i ansibleinventory.yml -m ping
+
+
+Ansible command syntax: 
+
+ansible (groupname) -m (module name) -a (arrguments)
+
+To list the module in ansible:
+ansible-doc -l
+
+
+some improtant and basic modules I should know
+
+copy
+template
+ping
+command
+yum     
+apt
+package     #work for any os
+dnf
+service
+get_url     url=xxx dest=/opt
+rpm_key     download rpm key   state=present key:xxx
+systemed    to enable the service    name=jenkins enable=true
+assert
+Lineinfile and Blockinfile
+File
+Debug
+Git
+Archive and unarchive
+Cron Module
+Wait_for 
+User 
+Include
+Set_Fact 
+shell
+delegate_to
+run_once
+block
+stat
+uri
+get_url
+raw
+systemd
+
+This is a variable you can put in your playbook to register output of the command. ex:
+
+- name: Init password jenkins
+  shell: cat /var/lib/jenkins/secrets/initialadminpassword
+  register: result
+-name: Print password jenkins
+  debug:
+  var: result.stdout
+
+
+
+Command and Shell module are not ideompotent.
+
+Difference b/w copy and template module
+Both modules can copy files from local server to host servers. Template module can/will replace variable with values in your file while copying.
+If variables are not defined template module will fail or throw error.  
+
+To check more about specific module
+ansible-doc ping/copy
+
+
+ansible all -m command -a "ping"
+ansible appServers -m command -a "git --version"
+ansible all -b -m yum -a "name=git state=present"
+ansible all -b -m yum -a "name=git state=absent"
+ansible all -b -m package -a "name=git state=absent"
+ansible all -b -m package -a "name=git state=absent autoremove=yes"
+ansible all -b -m service -a "name=sshd state=started"       #stopped #restarted
+ansible all -b -m copy -a "src=/data/index.html dest=/var/www/html/index.html"
+
+
+
+ 
+
+
+
+Ansible Playbooks
+
+Command to run ansible playbook
+ansible-playbook installhttpd.yml
+
+How to validate the syntax of your ansible Playbooks
+ansible-playbook (playbookname) --syntax-check
+
+How to do a dry run of ansible playbook
+ansible-playbook (playbookname) --check
+
+How to run a debug/verbose of a playbook.  More information about the playbook when it is running
+ansible-playbook (playbookname) -v      #High level logs
+ansible-playbook (playbookname) -vv     
+ansible-playbook (playbookname) -vvv
+
+How to run ansible playbook tasks step by step
+ansible-playbook (playbookname) --step
+
+How can we execute/skip particular or set of tasks in playbook?
+we can use tags in ansible to acheive this.
+
+How to get/check the tag values in playbook
+ansible-playbook (playbookname) --list-tags
+
+Execute single or multiple task by using tags
+ansible-playbook (playbookname) --tags "copy"
+ansible-playbook (playbookname) --tags "copy,install"
+
+Skip specific tags in playbook
+ansible-playbook (playbook) --skip-tag "copy"
+
+How to list hosts details which you are refering
+ansible-playbook (playbook) --list-hosts
+
+
+what is the different between task and handlers?
+Task by default will be executed one after the other sequentially
+Handlers are special kind of tasks. They will not execute by itself, some task has to notify the handler to get it executed.
+The handler will be executed at the end of the play when all tasks are completed and also when there is a change.
+
+
+Variable in Ansible
+
+Variables can be defined in multiple ways:
+1. With in the playbook using vars.
+
+- hosts: dbServers
+  become: true
+  gather_facts: no
+  vars:
+    name: Abhishek
+    lastname: Bhola
+
+2. We can pass variable as run time arrgument
+
+ansible-playbook (playbookname) --extra-vars "name=Runtime"
+
+3. Group Variable
+
+Group Variable can be defined at the group level. For all servers or specific group of servers (ex. appServer and dbServer). 
+So when we defined vars in all variable file, these vars will be avalaible for all those servers while executing the ansible-playbooks
+
+Default location 
+/etc/ansible/group_var/all.yml or appServer.yml
+
+4. Host Variable
+
+Host Variable can be defined at the Host level, for secific servers.
+So when we defined vars in host variable file, these vars will be avalaible to only that server while executing the ansible-playbooks
+
+Default location
+/etc/ansible/host_var/(hostname/IP).yml 
+
+File name should we hostname or filename which we have defined in the host inventory.
+
+5. Role Variable
+
+
+
+
+What is Ansible Vault
+
+ansible-vault create (filename)
+ansible-vault encrypt (filename)
+ansible-vault view (filename)
+ansible-vault edit (filename)
+ansible-vault decrypt (filename)
+
+
+ansible all -m ping --ask-vault-pass
+ansible-playbook playbookname --ask-vault-pass
+
+How to programatically run the playbook or command without its asking for password
+
+create a File
+vaultpass
+
+now while running the ansible command refer to this File
+ansible-playbook playbookname --vault-password-file=/data/vaultpass
+
+
+Ansible Roles
+
+Ansible roles are nothing but a set of predefined folder sturcture and files where we write task, handlers, template and variables.
+
+ansible-galaxy init httpd
+
+
+
+
+
