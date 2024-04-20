@@ -1,0 +1,1619 @@
+IAM =  Identity and Access Management
+=======================================
+
+    > Its a global service, we create users and assign them to groups.
+    > Root account created by default, should not be used or shared.
+    > Users are people within your organization, and can be grouped.
+    > Groups only contains user, not other groups.
+    > Users can belong to mutilple groups.
+
+ - IAM Permissions Policies: 
+     - users and groups can be assigned JSON documents called policies.
+     - polices contains access to aws services.
+     - this policies defines the permission of the users.
+     - In AWS, you apply the least privilege principle: don't give more permission than a user needs.
+
+ - IAM Password Policies:
+     - There are two types of defence mechanisms to protect users and groups to be compromised.
+     - In AWS, you can setup a password policy:
+     - Multi Factor Authentication - MFA
+
+ - IAM Roles: 
+     - Some AWS services will need to perfrom action on your behalf
+     - To do so, we will assign permission to AWS services with IAM roles.
+     - These IAM roles are just like a user, but they are intented to be used not by physical people, but instead they will be used by AWS services.
+    
+     Common Roles: 
+     - EC2 Instance roles.
+     - Lambda Fuction role.
+     - Roles for CloudFormation.
+
+ - IAM Security Tool:
+     > IAM Credential Report (account level)
+      - A report that list all your account's users and the status of their various credentials.
+     > IAM access Advisor (User level)
+      - Access advisor shows the services permissions granted to a user and when those services were last accessed.
+      - You can use the above information to revise your polices.
+       
+       "This will be very helpful because we are already taking about the principle of least privilge"
+
+ - IAM Best Practices:
+     - Don't use root account except for AWS account setup.
+     - Assign users to groups and assign permission to groups.
+     - Create a strong password policy.
+     - Use and enforce the use of MFA.
+     - Create and use roles for giving permission to AWS services.
+     - Use Access keys for programmatic access 
+     - Audit permissions of your account with the IAM credentials report and IAM access advisor.
+
+
+
+
+
+
+
+
+
+
+
+EC2 = Elastic Compute Cloud
+===========================
+
+    > EC2 is one of the most popular of AWS offering.
+    > EC2 = Insfrastucture as a serivce.
+    > It mainly consists in the capability of:
+      - Renting Virtual Machines
+      - Storing data on virtual drives
+      - Distributing load across machines.
+      - Scaling the services using an auto scaling groups.
+
+ - EC2 User data:
+     - It is possible to bootstrap our intances using an EC2 User Data script.
+     - bootstraping means launching commands when a machine starts.
+     - That script is only runs onces at the instance first start and never run again.
+
+     EC2 user data is used to automate boot tasks such as:
+       - Install updates
+       - Install softwares
+       - Downloading common files from the internet
+       - Anything you can think of.
+     But the more you add to you user data script, the more your instance has to do at boot time.
+     EC2 user data script runs with the root user.
+
+ - EC2 Instance Types:
+
+     - 7 different types of Instances  
+    
+    - General Purpose :-
+       - Great for a dive vers or coderepositories.
+       - Good balance between: Compute, Memory and Network
+       - This instance types contains below family
+       -  Mac  T4g T3 T3a T2   M6g  M5  M5a M5n M4 M1
+
+    - Compute optimized :- 
+       - Great for compute-intensive tasks that requires high performance processors:- 
+       - Batch processing workloads
+       - Media transcoding 
+       - High performing webservers
+       - High performance computing
+       - Dedicated gaming servers
+       - This instance types contains below family
+       - C6g     C6gn    C5   C5a   C5n   C4
+
+    - Memory optimized:- 
+        Fast performance for workloads that process large data sets in memory
+        Use Cases:
+         - High performance relational/non-relational databases.
+         - Distributed web scale cache stores
+         - In-memory databases optimized for BI 
+         - Application performing real-time processing of big unstructured data.
+         - This instance types contains below family
+         - R6g     R5      R5a     R5b     R5n     R4      X1e     X1      High Memory     z1d 
+    
+    - Accelerated computing:- 
+
+
+    - Storage optimized:- 
+        Great for storage-intensive tasks that requires high sequential read and write access to large data sets on local storage.
+        Use Cases: 
+         - High freqency online transaction processing system
+         - Relational and NoSQL databases
+         - Cache for inmemory databases
+         - Distributed filesystem
+         - This instance types contains below family
+         -  I3      I3en    D2     D3       D3en      H1
+
+ - Instance Feature
+     Measuring Instance Performance
+     Instance type naming convention
+       - m5.2xlarge
+       - m is the instance class
+       - 5 is the generation of the instance.
+       - 2xlarge is the size within the instance class.
+     Instance       vCpu        Mem(gib)        Storage         Network performance         EBS Bandwidth (Mbps)
+     t2.micro        1               1               EBS-Only        Low to Moderate         
+     t2.xlarge       4               16              EBS-Only        Moderate
+
+     
+
+ - EC2 Instances Launch Types:-
+
+    1- On-demand Instances -   Short workload, predictable pricing.
+    2- Spot instances      -   short worloads, cheap, can lose instance (less reliable)
+    3- Dedicated host      -   book an entier physical server, control instance placement
+    
+    But sometimes with servers, you know you are going to need them for a very long time and you can get cost savings by saying that to AWS.
+    4- Reserved           -    Need to use this for minimum 1 Year
+       There types of Reserved instance.
+        - Reserved Instance - long workloads, think of a database
+        - Convertible Reserverd instances - long worloads with flexible instances. (when you wana change your instance type over time).
+        - Scheduled reserverd instances - example = every Thrusday between 3 to 6 PM for one year.
+
+    - On-demand Instances:- 
+      - "Recommended for short-term and un-interruppted worloads, where you can't predict how the application will behave"
+      - Pay for what you use.
+      - Linux = biling per second, after the first minute.
+      - other OS = biling per hours
+      - Has the high cost but no upfront payment.
+      - No long term commitment.  
+
+    - Reserved Instances flavors
+        > Reserved Instance
+         - 75% discount as compared to on-demand.
+         - Reservation perdiod of 1 year or 3 year.  +3 years more discont.
+         - Purchasing options: no upfront | partial upfront = + discount | All upfront = ++ discount. 
+         - Reserve a specific instance type.    (t2.micro or c4.xlarge)
+         - Recommneded for steady-state usage application (think database)  {if you know you need a database for 3 years then reserving an instance gives you huge cost saving.}
+
+        > Convertible Reserverd Instance.
+         - can change EC2 instance type.
+         - up to 54% discount 
+
+        > Schedueled Reserverd instance.
+         - launch within time window you reserve.
+         - when you require a fraction of day/week/month
+         - still commitement over 1 to 3 years.
+
+    - Spot instances:- 
+       Can get upto 90% discount compared to on-demand
+       Instances that you can lose at any point in time if your max price is less then the current spot price. (spot price changes over time)
+       The MOST cost-efficient instances in AWS
+       Usefull for worloads that are resilient to failure:-
+        - Batch jobs
+        - Data Analysis
+        - Image processing
+        - Any distributed workloads
+        - Workload with a flexible start and end time
+        - Not suitable for critical jobs or databases
+
+
+    - Dedicated host
+      - on demand price 
+      - if you want a reservation than upto 70% off
+      - An EC2 dedicated host is a physical server with EC2 instances capacity fully dedicated to your use. Dedicated host can help you address  complicance requirements and reducde costs by allowing you to use your existing server-bound software license. (Basially renting an entier server in a data center of AWS)
+      - Allocated for your account for a 3 year period reservation 
+      - More expensive
+      - Useful for software that have complicated licening model (BRING YOU OWN LICENCE - BYOL)
+      - or for companies that have strong regulatory or compliance needs (to make sure no other customer of AWS can use that server but you.)
+
+    - Dedicated instances
+      - Instances running on hardware that's dedicated to you. 
+      - May share hardware with other instances in same account.
+      - No control over instance placement (can move after start/stop) (means no access to the underlying hardware)
+
+      Dedicated host vs Dedicated instances
+      -    Both Enables the use of physical server  
+      -    Per instance billing only on for dedicated instance .
+      -    Per host billing only for didicated host.
+      -    Visiblity of sockets, cores, host ids, and other access to physical server when you opt for dedicated host.
+      
+      Dedicated host are usefull basically when you have some server bound licences, whereas dedicated instances is when you needs some high level regulatory complicance that you are saying that the hardware will not be shared with anyone else 
+
+
+
+
+ - EC2 Placement Groups:- 
+
+       Sometimes you want to control over the EC2 instance placement within the AWS infrastucure.
+       That strategy can be defined using placement groups. 
+       When you create placement group, you specify one of the following stategies for the group:
+       -  Cluster  - Cluster instance into a low-latency group harware setup in a singe AZ. (gives you high performace but high risk aswell)
+       -  Spread   - spread instances across underlying hardware (max 7 instance per group per AZ) - Critical application
+       -  Partition - spread accross instances across many differnet partitions (which rely on differnt sets of racks) with in AZ. Scales upto 100 instance per group per AZ.
+
+    - Cluster 
+        All instances in the same rack (samehardware)     
+        Great network 
+        if the rack fails, all the instances will fail.
+        use cases:-
+          - Big data job that needs to complete fast
+          - Application that needs extermely low letency and highnetwork throughput.
+
+    - Spread
+        Ec2 instances will be placed in different hardware.
+        can span across AZs
+        Reduced risk of failure
+        Limited to 7 instance per AZ per placement group.
+        use case:-
+          - Application that needs to maximize  high avalaibility.
+          - Crtical Application where where each instances must be Isolated from failure form each other.
+
+    - Partition
+        Instances spread accross partition in mutiple AZs.
+        we can have upto 7 partion per AZ.
+        Each partition represents a rack in AWS.
+        The instance with one partion do not share the racks with the instance of other partition.
+        A partition failure can affect many EC2 instances but won't affect other partion Instances.
+        Use cases:- 
+          -  When an application can be partition aware to distribute the data and your servers across partion,
+          -  and usually, the use case are like big data applicaiton, which are partion aware
+
+ - EC2 Extra:- 
+   
+   - EC2 Hibernate:- 
+       - The in-memory (RAM) state is peserved. (all the data in ram will preserverd)
+       - The instance boot is must faster! (os not started/restarted)
+       - Under the hood: the RAM state is written to a file in the root EBS volume
+       - The Root EBS volume must be encypted.
+       - Basically the system will be froze or hibernated so the instance boot is fast
+     
+     How it works? 
+        Instance running with a Encrypted EBS Volume >> Stop - Hibernate >> moving RAM state to file in EBS >> Instance will be stopped but not the OS. >> Start >> RAM state move to the running instance.
+     
+     Use cases: 
+       - Long-running proccessing 
+       - saving the RAM state
+       - services that take time to initialize.
+    
+     Limitations!!
+       - Support only few instacnes families  C3,C4, M3, M4, R3, R4....
+       - RAM size must be less then 150GB
+       - not supported for Bare Metal instance.
+       - AMI support: Aamzon linux 2, Linux AMI, Ubuntu and windows.
+       - Root Volume must be EBS and enycrpted.
+       - Avalaible for on-demand and Reserverd instances and not spot instance.
+       - An instance cannot be hibernated more then 60 days.
+
+   - EC2 Nitro:- 
+
+     - Underlying platform for next generation of EC2 instances.
+     - New virtualizaiton technology.
+     - Allow better performances.
+     - Better underlying security
+
+   - EC2 vCPU
+     - Mutiple tread can run on one CPU (multitreading)
+     - A core is a CPU
+     - Each tread is represented as a virtual CPU (vCPU)
+     - Help to reduce the cost if you use less vCPU in a instance.
+     - Some licencing bound application uses CPU as a metric to issue a licence. We can optimize vCPU in AWS and select how many vCPU we need in a instance.
+
+   - EC2 - Capacity Reservation.
+     - EC2 capacity reservation ensure you have EC2 capacity when needed
+     - Basically if you want to plan for the capacity to make sure you can launch instances in a AZ of a specifc type around a specfic timeframe then use the EC2 capacity reservation.
+     - This can be combined with Reserverd instance and saving plans to do cost savings.
+
+  End of EC2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AWS STORAGE:
+===========
+
+- Elastic Block Storage - EBS Volume
+    An EBS volume is a network drive you can attach to your instance while they run.
+    It uses network to communicate with the instance which means there might be a bit of latency
+    It allows your instance to persist data, even after their termination.
+    They can be mounted to one instance at a time.
+    They are bound to specifc az.
+    Think of them as network USB 
+    Have a provisioned capacity (size in GBs and IOPS)
+ 
+    - EBS Volume Types:
+       There are Six Types and can be grouped them in several categories 
+       - gp2/gp3 (SSD) : Genaral Purpose SSD volume that balance price and performance for a wide variety of worloads.
+       - io1 and io2 (SSD) : Highest-performance SSD volume for mission-critical low-latency or high-thoughput worloads.
+       - st 1  (HDD) : Low cost HDD volume designed for frequently accessed data, thoughput-intensive workload.
+       - sc 1 (HDD) : Lowest cost HDD volume designed for less frequently accessed workloads
+
+       EBS Volume are characterized in Size | Throughput | IOPS (I/O Ops per second)
+       - only gp2/gp3 and io1/io2 can be used as boot volumes.
+    
+      - Genaral Purpose SSD
+         - Cost effective, low letency
+         - System boot volumes, developemend and test
+         - 1 GiB - 16 TiB
+         - gp3 : - new generation with more then 3000 IOPS and Thoughput and IPOS can be selected independently
+        
+      - Provisioned IOPS SSD
+         - Great for Database works
+         - Applicaton that needs more then 16000 IOPS
+         - io1 and io2
+    
+      - Hard Disk Drives HDD
+         - cannot be a boot volume
+         - 125 MiB - 16 TiB
+         - st 1 (datawarehouse) and st 2 (where lower cost is important).      
+    
+    - EBS Multi Attach - io1/io2 family
+        Attach the same EBS volume to mutiple EC2 instances in the same AZ
+        Each instance has full read and write permission.
+        Use case: -
+         Achive higer applcaiton avalaibility in clusted Linux applcation (Teradata)
+         Very specifc type of workload
+         Must use a FS which is cluster aware
+
+    - EBS snapshot
+       Make a backup (snapshot) of your EBS volume at a point in time.
+       Not necessary to detach a volume to do snapshot but recommneded.
+       Can copy snapshot across AZ or region.
+       Snapshots does'nt belongs to a AZ but bound to region, while Volume bound to a AZ.
+
+    - EBS Encrption 
+       When you create a EBS volume, you get the following 
+        - Data at rest is encrpyted inside the volume.
+        - All the data in fligh moving b/w the instance and the volume is encrpyted.
+        - All the snapshot are encrypted.
+        - All volumes created from the snapshot are enycrpted
+        - Encrption and decryption are handeled trasparently (you have nothing to do)
+        - Encryption are leveraged by KMS
+
+       How to encrypt and unencrypted EBS volume
+        - Create a EBS snapshot of the volume.
+        - Encrpt the EBS snapshot (using copy)
+        - Create new EBS volume from the snapshot.
+        - Now attach the this volume to the orinal instance or select the unecypted snapshot and create a volume out of it and select to encrypt the volume
+
+
+
+- EC2 Instance Store:
+    EBS volumes are network drives with good but "limited" performance.
+    If you need a high performance hardware disk, use EC2 instance store.
+     Better I/O performance.
+     EC2 Instance store lose their data storage if they are stopped (ephermal) 
+    EC2 instance runs in a hardware and sometimes these hardware have storage space. This storage space can be used as Instance store, so it feels like a dedicated storage to the instance.
+     
+    Limitation 
+     Not good for long term place to store data.
+     Good for buffer/ cache / scrach data / temporary content.
+     Risk of data loss if hardware fails
+     Backup and Replication is your responsibilty
+
+
+- EFS - Elastic File System
+    
+    Managed NFS (network file system) that can be mounted on many EC2.
+    EFS works with EC2 instances in multi AZ
+    Highly avaiable, scalable, expensive (3x gp2), pay per use/
+    Use cases- content management, web serving, data sharing , wordpress
+               Uses NFSv4.1 protocol
+               uses security groups to control access to EFS
+               compatible with LINUX based VMs only
+               Encryption at rest by KMS
+               Can leverage EFS-IA 
+    
+    EFS scale 
+      1000s of concurrent NFS clients, 10+GBs thoughput
+      Grow to petabyte-scale network file system automatically
+      Two types of mode
+        - Performance mode (set at EFS creation time)
+             General Purpose - default  (good for web servers, CMS)
+             MAX I/O = higer letency but higher thougput (good for  big data, media processing)
+        - Throughput mode
+             Brusting = Through put scales with the FS size
+             Provisoned = you can customize the thoughput
+    
+    Storage Tiers (lifecycle management feature - move file after N days)  - storage class
+            - Standard : for frequently accessed files.
+            - infrequent access (EFS-IA) : cost to retrive files, lower cost to store
+
+
+- S3 - Simple Storage Solution
+    Amazon S3 allow people to store objects (files) in the buckets (directories).
+    Bucket must have a global unique name.
+    Bucket are defined at the region level
+    Naming convention
+        - no upper case
+        - no underscorce
+        - 3-63 characters long
+        - Not an IP
+        - Must start with lowercase letter or number.   
+
+    We store objects (files) in the S3. And each object have its key (full path of the file).
+        For ex.   s3://my-bucket/myfile.txt                            here myfile.txt is the key
+                  s3://my-bucket/my_folder/anotherfolder/myfile.txt    here my_folder/anotherfolder/myfile.txt is the key
+        
+    The key is composed of prefix + object name
+        For ex    s3://my-bucket/my_folder/anotherfolder/myfile.txt   
+                        here  my-bucket/my_folder/anotherfolder is the prefix and myfile.txt is the object name.
+     * There is no concept of "directories" within bucket (though the UI will trick you to think otherwise)
+     * Just keys with very long name that contains slashes "/".
+
+     Object value are the content of the body
+       -  Max Object size is 5TB
+       -  If uploading more than 5GB, must use "multi-part" upload.
+       -  Each object in S3 can have metadata (list of text key/value pairs -system or user metadata) or tags (upto 10) - usefull for security/lifecycle
+       -  Version ID (if version is enabled.)
+
+  -  Amazon S3 Versioning
+
+     - You can version your files in Amazon S3
+     - It is enabled in the bucket level
+     - Same key overwrite will increment the version : 1,2.3...
+     - It is best practice to version your buckets
+     - protect againts unintended deletes (ability to restore a verison)
+     - Easy roll back to previous version.       
+     
+     Notes: - 
+       Any file that is not versioned prior to enabling versioning will have version "null"
+       Suspending versioning does not delete the previous versions.
+
+
+  -  S3 Encryption for Objects
+       - There are 4 methods of encrpting objects in s3
+       - SSE-SE: encrpts S3 objects using keys handled and managed by AWS
+       - SSE-KMS: leverage AWS key Management service to manage encrption keys
+       - SSE-C: When you want to manage your own encrption keys.
+       - Client Side Encrption.
+
+     SSE-S3
+          SSE-S3 encryption using keys handled and managed by Amazon S3.
+          Object is encrypted server side
+          AES-256 encryption type
+          Must set header "x-amz-server-side-encryption":"AES256"
+          The data key is enterly owned and managed by Amazon s3.
+
+     SSE-KMS: 
+          Encryption using keys handled and managed by KMS.
+          KMS Adavantages: user control + audit trail
+          Object is encrypted server side.
+          Must set header: "x-amz-server-side-encrption":aws:kms"
+
+     SSE-C: 
+          server-side encryption using the data keys fully managed by customer outside of AWS
+          Amazon S3 does not store the encryption key you provided.
+          HTTPS must be used (because you will send the object with keys over the network so data in transit must be encrpted using HTTPS)
+          Encryption key must provided in HTTP header of every HTTP request made.
+          Can be used on via AWS CLI, because we need to pass encrption keys while uploading the files into the bucket.
+        
+     CSE:
+          Client side encryption 
+          Client must encrypt data themselves before sending to S3
+          Some client libraries can help you do this for example, Client library such as the Amazon S3 Encryption Client is the way to perform client side encrption.
+          Client must decrypt data themselvers when retreing from S3
+          Customer fully manages the keys and encrption cycles
+
+
+  - S3 Security and Bucket Policy:-
+    
+    S3 Security
+    - User based
+      - IAM Polices - which API calls should be allowed for a specific user from IAM console
+    - Resource Based
+      - Infamous S3 bucket policies, 
+      - Bucket Policies - bucket wide rules from the S3 console - allows cross account access.
+      - Oject Access control list -  finer grain
+      - Bucket Access control list - less common
+    Note:- an IAM pricipal can access S3 Object if 
+           - the user IAM permissions allow it OR the resource policy ALLOWS it.
+           - AND there's no explicit DENY
+    
+    S3 Bucket Policies 
+       - JSON based policies
+          Resource: bucket and objects
+          Actions: Set of API to Allow or Deny
+          Effect: Allow/Deny
+          Pricipal: The account or user to apply the policy for
+    Use S3 Bucket for policy to: 
+        Grant public access to the bucket.
+        Force objects to be encrypted at the upload.
+        Grant access to another account (Cross Account)
+
+    Bucket settings for Blocked Public Access.
+     - Block public access to buckets and objects granted through
+        - new access control list (ACLs)
+        - any access control list (ACLs)
+        - new public bucket or access point policies
+    - Block public and cross account access to bucket and objects through any public bucket or access point policies
+
+        Just remember there is a way to block public access to your buckets using above settings.
+        If you know that your bucket will never ever be public, leave above setting on. These setting can be set in account level.
+    
+    S3 Security Other
+     - Networking
+       - Support VPC Endpoints (For instance in VPC without www internet)
+     - Logging and Audit
+       - S3 Access Logs can be stored in other S3 bucket
+       - API call can be logged in AWS CloudTrail
+    - User Security:
+       - MFA Delete: MFA can be required in versioned buckets to delete objects.
+       - Pre Signed URLs: URLs that are valid only for a limited time (ex: premium video service for logged in users)
+
+    
+ End of S3
+
+
+
+Load Balancer
+================
+        Load Balancers are servers that forward internet traffic to mutiple servers (EC2 instance) downstream.
+
+        Why use a load balancer?
+        -  To expose a single point of access (DNS) to your application.
+        -  Spread load across mutiple downsteam instances.
+        -  Seamlessly handle failurs to downsteam instances.
+        -  Do regular health checks to your instances.
+        -  Provide SSL termination (HTTPs) for your websites.
+        -  Managed by AWS
+
+        Health Checks
+        - Health check are curcial for LBs.
+        - They enable the load balancer to know if instance it forward traffic to are avaliable/healthy to reply to request.
+        - The health check is done on a port and a route (/health is common) every 5 seconds.
+        - if the reponse is not 200 (ok), then the instance is unhealthy.
+
+         Route based on 
+
+    Types of Load Balancers.
+     
+        - Classis Load Balancer - V1 - old generation - 2009, HTTP, HTTPS and TCP 
+        - Application Load Balancer - V2 - new generation - 2016  - HTTP, HTTPS and websockets.
+        - Network load Balancer - v2 - new genration - 2016  - TCP, TLS (secure TCP) and UDP
+        - Gateway Load balancer ?
+        You can setup either internal (private) or external (public) load balancer.
+
+         Load balancer use security groups
+
+        For troubleshooting 
+        - 4XX errors are client induced errors.
+        - 5XX erros are application induced errors.
+        - Load balancer Errors are 503 means the capacity or no register targets.
+        - If the LB's can't connect to you application, check your SGs!
+
+        Monitoring
+        - ELB access logs will log all the access requests (so you can debug per request)
+        - CloudWatch Metrics will give you aggregate statistic (ex. connection count)
+
+
+  -  Classis Load Balancer 
+        Supports TCP (Layer4), HTTP and HTTPS (Layer 7)
+        Health check are TCP or HTTP based.
+        Fixed hostname 
+    
+  -  Application Load Balancer
+        Application load balancer is Layer 7 (HTTP)
+        Load balancing to mutiple HTTP application across machines (target groups)
+        Load balancing to mutiple applications on the same machine
+        Support for HTTP/2 and WebSocket
+        Support redirects (From HTTP to HTTPs for expample)
+        
+      Route Routing
+        Routing tables to different target groups (group of instances)
+         - Routing based on path in URL (example.com/user and example.com/posts) to different target groups
+         - Routing based on the hostname of the URL (one.example.com and other.example.com) to differnt target groups
+         - Routing based on QueryString, Headers  
+    
+      ALB are great fit for micro services and container based application (container or ECS)
+      Has a port mapping feature to redirect to a dynamic port in ECS.
+
+        
+      In comparison, we'd need one Classic load balancer per application but with ALB, one ALB in front of many application. 
+
+      Target Groups can be below:
+      
+      - EC2 instances (can be managed by ASG) - HTTP
+      - ECS tasks (Managed by ECS itself) - HTTP
+      - Lamda Functions  - HTTP request is traslated into a JSON event
+      - IP Address - must be private
+
+       ALB can route to mutiple target groups
+       Health Checks are at target group level
+
+
+       Good to know
+        Fixed hostname is associated with your ALB (xxx.region.elb.amazonaws.com)
+        The application servers don't see the IPs of the client directly.
+            -  The true IP of the client is inserted in the hearder X-Forwarded-For
+
+
+  -  Network Load Balancer
+    ======================
+            -   Network load balancer (Layer 4) allow to:
+                 - Forward TCP and UDP traffic to your instacne
+                 - Handle millions of request per second
+                 - Less latency ~ 100ms ( vs 400ms for ALB )
+            - NLB has one static IP per AZ, and support assigning Eastic IP (helpful for whitelisting specifc IP)
+            - NLB are used for extreme performance, TCP and UDP traffic.
+
+
+
+  -  Load Balancer Stickiness
+
+        - It is possible to implement stickiness so that the same client is always redirected to the same instance behind a load balancer.
+        - This works for classic load balancer and Application load balancers
+        - The "cookies" used for stickiness has an expiration date you control.
+        - Use case: make sure the use don't lose his session data.
+        - Enabling stickiness may bring imbalance to the load over the backend EC2 instances.
+        - The stickiness setting is at Target group level(under attribute), not at LB level.
+
+  -  Cross zone balancing 
+        Its an option or a feature comes with ELBs to balance or distribure the load evenly across all registed instances in all AZs.
+        
+        With cross zone load balancing you get:- 
+
+        Load will be distributed evenly across all instances in all AZs regardless of which AZs the instances are in.
+            suppose you have 2 ELBs in two differnt AZs, One AZ has 2 instances and the other has 8 instances. Client is sending 50% traffic to first ELB and 50% traffic to another ELB.
+            With corss Zone load balancing on, the traffic will be evenly distributed to all 10 instances regardless of which AZs the instances are in. That means each instance will receive 10% traffic.
+        
+        With out cross zone load balancing you get:- 
+        
+        Load will not be distributed evenly across all instances in all AZs
+            suppose you have 2 ELBs in two differnt AZs, One AZ has 2 instances and the other has 8 instances. Client is sending 50% traffic to first ELB and 50% traffic to another ELB.
+            With corss Zone load balancing off, 50% of traffic would be served by only 2 instances which are behind the First ELB and 50% taffic will go to 8 instance which are behind the second ELB. Which means 25% on each instances on the first ELB and 6.25% on each instance of the second ELB.
+
+        ALB
+            - Always on (can't be disabled)
+            - No charges for inter AZ data
+                
+        NLB
+            - Disabled by default
+            - You pay charges for inter AZ data if enabled
+
+        CLB 
+            - Through Console = Enabled by default.
+            - Though CLI = Disabled by default.
+            -  No charges for inter AZ data
+
+  -  SSL/TSL - Bacis
+
+            - An SSL Certificate allows traffic between your clients and your load balancer to be encrypted in trasit (in-flight encryption)
+            - SSL refers to secure sockets layers, used to encrpt connections.
+            - TSL refers to transport layers security, which is a newer version.
+            - Nowadays, TSL certificates are mainly used, but people still refer as SSL.
+
+            - Public SSL certificated are issues by Certificate Authorities.
+
+            Users connect over HTTPs (s because its using SSL certificates, which means it data intansit is encrypted and secured) and it connects over the public internet to your load balancer, and internally Load balancer does something called SSL certificate termination. And in the backend, it can talk to your instances using HTTP. 
+
+            - The load balancer uses an X.509 certificates.
+            - You can manage certificates using AWS certificate manager.
+            - HTTPs listeners 
+                    - You must specify an default certificate.
+                    - You must add an optional list of cert to support mutiple domains.
+                    - Client can use SNI (server name indication) to specify hostname they reach.
+
+
+            Server Name Indication - SNI
+            =============================
+
+            - SNI solves the problem of loading mutiple SSL certificates onto one web server (to serve mutiple websites)
+            - Its a newer protocol, and requires the client to indicate the hostname of the target server in the initial SSL handshake.
+            - The server will then find the correct certificate, or return the default one.
+
+            Note
+             Only work with ALB and NLB
+             Does not work with CLB
+
+             CLB
+             - Support only one SSL certificate
+             - Must use multiple CLB for multiple hostname with multiple SSL certificate
+             
+             ALB
+            - Supports multiple listeners with mutiple SSL certificates.
+            - Uses server name indication (SNI) to make it work.
+           
+             NLB
+            - Supports multiple listeners with mutiple SSL certificates.
+            - Uses server name indication (SNI) to make it work.
+
+
+  -  ELB Connection Draining.
+
+    Feature nameing: -
+         - CLB: Connection Draining
+         - Target Group: Deregistration Delay.
+                        (For ALB and NLB)
+         - Time to complete the "in-fligt requests" while the instance is de-registering or unhealthy.
+        - Stop sending new request to the instance which is de-registering.
+
+ End of ELB
+
+
+
+
+
+
+
+
+
+
+Auto Scaling Groups:
+===================
+
+    Scalibility and High Availability
+    Scalability means that an application / system can handle greater loads by adapting.
+    - Vertical scalability
+        - Increasing the size of the instance.
+        - For example, your application runs on a t2.micro
+        - scaling that application vertically means running it on t2.large
+        - vertical scalability is very common for non-distributed systems, such as database.
+        - RDS, elasticache  are the services can be vertically scaled.
+        - There's a limit to scale (hardware limit)
+    - Horizontal scalability = elasticity
+        - Horizontal means increasing the size of the number of instance/ systems for your application.
+        - Horizontal scaling implies distribute system.
+        - Common for web application or mordern application.
+        - Easy to horizontly scale thanks to cloud offering like AWS.
+
+    High Availability usually goes hand in hand with Horzontal scalling.
+    High Availability usually means running your application/system in at least 2 data centers (== AZs)
+    The goal is to high availability is to survive a datacenter loss.
+
+    ASG:-
+    The Goal of an ASG is to:
+     - Scale out to match an increased load.
+     - Scale in to mathc an decreased load.
+     - Ensure we have a minimum and a maximum number of machines running.
+     - Automatically register new instances to a load balancer. 
+    
+    We have a minimum size, desired capacity and maximum size parameters to select the instance capacity.
+    
+    ASG have following attribures:- 
+       - A Launch Configuration /Launch Template
+       - AMI + Instance Type
+       - EC2 user data
+       - EBS volume
+       - Security groups
+       - SSH key pairs
+       - Min Size/ Max Size/ initial capacity.
+       - Network and subnets information
+       - Load balancer information
+       - scaling policies   (what will trigger the scale out and scale in)
+    
+    ASG Alarms
+       - It is possible to scale an ASG based on Cloud Watch alarms.
+       - An alarm monitors a metric (such as avearage CPU)
+       - Metric are computed for all the overall ASG instances.
+       - Based on the alarm:
+            - We can create scale out policies
+            - We can create scale in policies
+    
+    ASG Scaling Rules
+        - It is possible to define better auto scaling group rules that are directly managed by EC2.
+          - Target Average CPU usage.
+          - Number of request on the ELB per instance.
+          - Average Network in
+          - Average Network out
+          - Also you can define custom metric to scale in and out.
+          - Ex numbers of users connected.
+
+    Scaling policies:-
+        Target Tracking Scaling
+             - Most simple and easy to setup
+             - Example - I want the average ASG CPU to stay around 40%
+        Simple/ Step scaing
+             - When a cloud watch alarm is triggerd (example CPU > 70% ) add 2 units.
+             - When a cloud watch alarm is triggerd (example CPU < 30% ) remove 1 units.
+        Scheduled Actions:-
+             - Anticipate a scaling based on known usage patterns.
+             - Example - increase the min capacity to 10 at 5 PM on Fridays.
+        
+    Autosaclling cooldowns.
+            - The cooldown period helps to ensure that your auto scaling group doesn't lanuch or terminate additinal instance befre the previous sacling policies takes effect.
+            - In additon to default cooldown for ASG, we can create cooldowns that apply to a specifc simple scaing policy.
+            - A scaling-specifc cool down period overrides the default cooldown period.
+
+    ASG Brain DUMP
+        -   Scaling policies can be on CPU, network... can even be on custom meteric or based on a scheduel.
+        -   ASGs use Launch configuration or Launc tempates (newer)
+        -   To update a ASG, you must provide a new launch configuration/ launch template.
+        -   IAM roles attached to an ASG will get automatically assigned to EC2 instances.
+        -   ASG are free, You pay for the underlying resources being launched.
+        -   Having instance under a ASG means if they get terminatated for whatever reason, the ASG will automatically creates new ones as a replacement. 
+        -   ASG can terminate instances marked as unhealthy by an LB (and hence replace them).
+
+    ASG Default Terminiation policy
+        - Find the AZ which has the most number of intances.
+        - if there are multiple instances in the AZ to choose from, delete the one with the oldest launch configuration.
+        - ASG tries to balance the number of instances across AZ by default.
+    
+    ASG Lifecycle hooks
+        - By defautl as soon as intances is launched in an ASG it's in service.
+        - You have the ablility to perform some extra steps before the instance goes in service (pending state)
+            here you can define a pending lifecyle hooks so if you configure the instance before moving it to inservice.
+            Pending: wait >>> Pending: Proceed >> Inservice
+
+         Similary You have the ablility to perform some action before the instance is terminated by ASG (Terminate state)
+            Here you can define a terminate lifecyle hooks so if you want to extract some logs fron the instance before moving it terminate state.
+            Termiate: wait >>> Terminate: Proceed >> Terminated
+
+    ASG Launch configuration vs Launch tempaltes
+            - Both lets to define how your instance will be launched under an ASG.
+            - Launch configuraiton (legacy)
+              - Must be re-created everytime when there is a change
+            - Launch Templates (newer)
+              - Can have multiple versions
+
+
+Amazon RDS
+==========
+ 
+  RDS stands for Relational Database Service.
+  Its managed DB service use SQL as a query language.
+  It lets you to create databases in the cloud that are managed by AWS
+  - Postgres
+  - MySQL
+  - MariaDB
+  - Oracle
+  - Microsoft SQL Server
+  - Aurora
+   
+AMAZON Route53
+==============
+
+        Route 53 is a Managed DNS (Domain Name System)
+        DNS is colletion of rules and records which helps client understand how to reach a server through its domain name.
+        In AWS, the most common records are: 
+        - A: hostname to IPv4
+        - AAAA: hostname to IPv6
+        - CNAME: hostname to hostname
+        
+        - Alias: hostname to AWS resource
+
+        Route53 can use:
+            Public Domain names you own or buy
+            Private Domain names that can be resolved by your instance in your VPC
+        
+        Features:
+            - Load Balancing (through DNS.. also called client load balancing)
+            - Health Checks (limited)
+            - Routing policy: Simple failover, geolocation, latency, weighted, multi vaule.
+        
+        You pay $0.50 per month per hosted zone.
+
+
+        Route53 TTL (Time to live)
+            - TTL is bacially a way for web browser and client to cache the response of the DNS query so to not overload the DNS.
+            - Once the TTL has been set in the Route53 record for say TTL set to 300 seconds, then when client tries to connect to DNS and get a reply, it will also get TTL with it. So in this case the response will be valid till 300 seconds and during this time period client will not talk to DNS but looks internally as it already has a response and look into it. After the TTL timeouts the next connection go to the DNS for query.
+
+            High TTL : eg.24 hours
+             - Less Traffic
+             - Possible Outdated records.
+            Low TTL : e.g 60s
+             - High Traffic
+             - Records will be outdated for less time.
+             - Easy to change records
+            Its mandatory to each DNS record to specify a TTL
+
+        CNAME vs Alias
+        =============
+            AWS Resources (LBs,Cloudfront) expose an AWS hostname (lbl-1245.us.east-2.elb.amazonaws.com) but you want it to be myapp.mydomain.com
+            CNAME - Point hostname to any other hostname (app.mydomain.com to blabla.anything.com)
+                    only work for nonroot domain. i.e something.mydomin.com and won't work for mydomain.com
+            Alias:  Point to hostname to an AWS resource.(app.mydomain.com to blabla.amazomaws.com)
+                    Works with both root and nonroot domain. i.e. mydomain.com
+                    Free of charge
+                    Native health checks
+        
+        Health Checks
+                - Have X health check failed => unhealthy (default 3)
+                - After X health check passed => healthy (default 3)
+                - Default health check interval is 30 sec. (can se to 10sec - high cost)
+                - Can have HTTP, TCP and HTTPs health checks(no SSL verification)
+                - Posibility of integrating the health checks with CloudWatch
+                - Health check can be linked directly to Route53 DNS queries!
+        
+        Routing policy - 
+            - Simple routing policy
+                used when you need to redirect to a single resource.
+                You can't attach healthcheck to simple routing
+                if mutiple values are provided/returend a random one is chosen by the client/browser. This also called as client side load balancing.
+            - Weighted Routing policy
+                Control the % of request that go to the specific endpoint
+                example two records (myapp.com to instance1 and another myapp.com to instance2)with weighted policy, one for 70% and one for maybe 30%
+            - Letency Rounting policy
+                Redirect to the servers that has the least latency close to us.
+                Super useful when latency of users is a priority
+                Latency is evaluated in terms of users to designated AWS region
+                Germany may be directed to US (if that's the lowest latency)
+                Need to create multiple records sets with lateancy routing policy and in each policy mention the instanse region the instances belongs to.
+            - Failover Routing Policy
+                We create a Record and select the failover routing policy, here we need to assoisate this with a health check.
+                The record with the health check is set to be primary and we will create another record with failover policy and set it to secondory. So if for somereason the healthchecks fail or primary the DNS query will be send to secondry.
+            - Geolocation Routing Policy
+                
+
+
+
+Difference b/w EC2 Instance connect and Session Manager:
+=========================================================
+
+EC2 Instance Connect offers an alternative to complicated SSH key management strategies. By integrating with IAM and the EC2 instance metadata available on all EC2 instances, you get a secure way to distribute short-lived keys and control access by IAM policy, it means you replace the key with the IAM policy.
+
+But there are some limitation of EC2 Instance Connect like AMI type, public IP and Inbound port… etc.
+
+In addition to not requiring you to open inbound ports, you can use Session Manager with AWS PrivateLink to prevent traffic from going through the public internet. Session Manager also support the on-premises server, all you need to do is install the SSM agent.
+Session manager can access both Windows and Linux boxes.
+
+
+Security Groups:-   
+    They will control how the network traffic is allowed into and out of the instance.
+    Security groups only contains allow rules.(no deny rules).  
+    Security groups can have rules which can be referenced by IP or by security group.
+    Security groups are acting as a firewall on the EC2 instance,
+        They regulate:-
+            -  Access to ports
+            -  Authorised IP ranges
+            -  Control of inbound network
+            -  Control of outbound network
+    Its good to maintain a seprate security group for SSH access.
+    By default all inbound taffic is blocked and all outbound taffic is authorised.
+
+    Classic ports to know 
+    22 SSH
+    21 FTP
+    22 SFTP
+    80 HTTP
+    443 HTTPS
+    3389 RDP
+
+Public IP 
+    - Public IP means the machine can be identifed on the internet WWW
+    - Must be unique across the web (not two machines can have the same public IP)
+    - Can be geo-loated easily
+
+Private IP
+     - Private IP means the machine can be identified on the a private network only.
+     - The IP must be unique accross the private network
+     - But Two different private network can have same IPs.
+     - Machines connect to WWW using an internet gateway (proxy)
+     - Only a specific range of IPs can be used as private IP.
+
+Elastic IP
+    -  When you start and stop an EC2 instance it will change its public IP.
+    - If you need to have a fixed IP for your instance, you need an Elastic IP.
+    - An elastic IP is a Public IPv4 and you own it as long as you don't delete it.
+    - You can attach it to one instance at a time.
+    - With an elastic IP address, you can mask the failure of an instance or software by rapidly remapping the address to the another instance in your account.
+    - You can only have 5 elastic IPs in your account. 
+
+    - OVERALL -  try to avoid using Elastic IP:
+                - They often reflect poor architectural decisions.
+                - Instead, use a random public IP and register a DNS name to it.
+                - or we can use a load balancer and don't use a public IP.
+
+
+
+
+ - AMI - Amazon Machine Image.
+    AMI are a customization of an EC2 Instance.
+     - you can add your own software, configuration, operating system, monitoring
+     - Faster boot/ configuration time because all your software is prepacked.
+     - AMI are bound to specifc region and can be copied accross region.
+     - You can launch EC2 from AMIs.
+     - Public AMI : AWS provided
+     - Own AMI : you maintain yourself
+     - AWS MarketPlace : AMI form someone else.
+
+    AMI Process - 
+        Start and EC2 instance and customize it.
+        Stop the instance for data intergrity.
+        Build an AMI - this will also create EBS snapshots in background
+        Launch instance from other AMIs.
+
+
+
+
+
+AWS Integration and Messaging = SQS, SNS and Kinesis:
+=====================================================   
+  When we start deploying multiple applicaitons, they will inevitably need to communicate with one another.
+  There are two patterns of application communication
+
+   1. Synchronous communication                    2. Asynchronous/Event based
+     (application to application)                  (application to queue to application)
+    
+    Buying Service <---> Shipping Service       Buying Service-->Queue-->Shipping Service
+
+    Synchronous between applicatons can be problematic if there are sudden spikes of traffic
+    What if you need to suddenly encode 1000 videos but usually it's 10?
+
+    In that case, it's better to decouple your applications,
+     - using SQS: queue model
+     - using SNS: pub/sub model
+     - using Kinesis: real-time steaming model
+    These services can scale independently from out application!
+
+    
+   - SQS - Simple Queuing Service 
+         
+         SQS queue contains messages
+         Well, something needs to send messages into SQS queue, whatever send message to SQS queue called a Producer.
+         Its possible to have one or multiple producers sending messages to SQS queue. (For ex. process this video or process this order).
+         Whatever message you create goes into the queue.
+
+         Then something needs to process the messages from the SQS queue and recive them, and it's called Consumers.
+         You can have multiple consumers
+
+
+         [Producer 1]   >>>(Send message)>>>>                                              [Consumer]
+
+         [Producer 2]   >>>(Send message)>>>>      [SQS Queue]   >>>(Poll message)>>>>     [Consumer]
+
+         [Producer 2]   >>>(Send message)>>>>                                            
+
+    
+            So queuing service is here to be a buffer to decouple between your producers and your consumers.
+
+        SQS Standard Queue.
+          - Oldest offering
+          - Fully managed service, used to decouple applications
+        
+        Attributes: 
+          - Unlimited throughput, unlimited number of messages in the queue.
+          - Default retention of message is 4 day, minimum 1 minute to maximum is 14 days.
+          - Low latency 
+          - Limitation of 256KB per message sent.
+
+        Can have duplicate messsage (at least one delivery, occasionally)
+        Can have out of order message (best effor ordering)
+
+
+        Producers
+
+        Producers send messages to SQS queue using the SDK (SendMessage API)
+        The message is persisted in the SQS queue until a consumer reads adn delete it.(which significes the message has been processed)
+
+        Ex:- Send an order to be processed.
+          - order id
+          - customer id
+          - Any attribute you want
+
+        Consumers
+
+        Consumers (they are applicaiton running on EC2 instance, servers or AWS Lambda) (basiacally your code)
+        Poll SQS for messages (receive up to 10 messages at a time) 
+        Process the message (example: insert the message into an RDS database)
+        Delete the message using the DeleteMessage API
+        
+       Ex:- Multiple EC2 instances Consumers
+                        >>set of messages>>    EC2
+        [SQS Queue]     >>set of messages>>    EC2
+                        >>set of messages>>    EC2
+
+        Consumers receive and process messages in parallel
+        Each consumer will receive a differnt set of messages by calling the poll function.
+        Consumer delete the message after processing them
+        We can scale consumers(EC2) horizontally to improve throughput of processing.
+
+        SQS with Auto Scalling Groups
+
+            [SQS Queue]     >>poll for messages>>    ASG (EC2,EC2,EC2) 
+
+            Using CloudWatch custom metric called "Queue Length (appoximate number of messages)" and set an alarm so that we can scale in and out the EC2 instances in our ASG
+
+    
+     SQS to decouple between applicaiton tiers   
+
+       ---> Requests---> FrontEnd WebApp ASG(EC2,EC2,EC2) ----> S3
+
+       Suppose your applicaiton received a request to process/render a video and then store it to S3 bucket, the processing of the video can take time and use your CPU and memory, what if you receive mutiple request at a same time? it could slow down the process or could lead to application unavaliablity.
+
+       To fix this we need to opt for a simple solution, the video processing request will recived by Front end ASG and using SQS the main process will happend in a backend ASG and then it stored to the S3 bucket. see below
+
+       ---> Requests---> FrontEnd WebApp ASG(EC2,EC2,EC2) ----> [SQS ] ---->  Backend Processing ASG(EC2,EC2,EC2)  ---> S3
+
+       With this architechure, we can scale the frontend and backend accordinly but intependently.
+
+
+     SQS Securtiy
+       - Encryption:
+          - In-flight encryption using the HTTPS API
+          - At-rest encryption using KMS keys
+          - Client-side encryption if the client wants to perform encryption/decryption itself
+
+        Access Control 
+          - IAM polices to regulate access to the SQS API
+        SQS Access polices 
+          - Similar to S3 bucket polices
+          - Usefull for cross-account access to SQS queue
+          - Usefull for allowing other services(SNS,S3) to write to an SQS queue such as S3 events.
+    
+ 
+ 
+   - SNS Simple Notification Service.
+
+        What if you want to send one message to many different receivers?
+
+         Direct Integration, see below
+
+                              >>>>  Email notificaiton
+            [Buying service]  >>>>  Fraud Service
+                              >>>>  Shiping Service
+                              >>>>  SQS Queue
+
+                    VS
+
+        Pub/Sub pattern, see below 
+    
+                                                >>>>  Email notificaiton
+            [Buying service] --->[SNS Topic]    >>>>  Fraud Service
+                                                >>>>  Shiping Service
+                                                >>>>  SQS Queue
+         
+         The "event producer" only sends message to one SNS topic
+         As many "event receivers" (subcription) as we want to listen to the SNS topic notification.
+         Each subscriber to the topic will get all the messages.
+         up to 10,000,000 subscription per topic
+         100,000 topic limit
+         subscriber can be:
+            - SQS
+            - HTTP/ HTTPS
+            - Lambda
+            - Email notificaiton
+            - SMS messages
+            - Mobile notificaitons
+        
+        SNS integrates with a lot of AWS services (At in the center of the AWS)
+         - Many AWS services can sends data directly into SNS for notificaiton.
+         - CloudWatch Alarms
+         - ASG notifications
+         - S3 bucket events
+         - CloudFormation (upon state change of your stack >> failed to build, etc)
+         - Etc
+
+        How to publish
+        - Topic Publish (using SDK)
+           - Create a topic
+           - Create a subscriptions (or many)
+           - Publish to the SNS topic.
+        - Direct Publish (for mobile apps SDK)
+
+        SNS Security
+
+        - Encryption:
+          - In-flight encryption using the HTTPS API
+          - At-rest encryption using KMS keys
+          - Client-side encryption if the client wants to perform encryption/decryption itself
+
+        Access Control 
+          - IAM polices to regulate access to the SNS API
+        SNS Access polices 
+          - Similar to S3 bucket polices
+          - Usefull for cross-account access to SQS queue
+          - Usefull for allowing other services(SNS,S3) to write to an SNS topics.         
+          
+
+Serverless
+=========
+
+    
+    What's a serverless?
+     - Serverless is a new paradigm in which the developers don't have to manage servers anymore.
+     - They just deploy code.
+     - They just deploy funcitons.
+     - Initailly.. serverless meant = FaaS (Function as a service)
+     - Serverless does not mean there are no servers, it means you just don't manage/provission/see them
+
+AWS Monitoring
+==============
+
+  - CloudWatch Metric
+    - CloudWatch provides metric for every services in AWS
+    - Metric is a variable to monitor (CPU Utilizaton, Networkin..)
+    - Metric belongs to namespaces (grouped)
+    - Dimension is an attribute of a metric (instanceid, enviroment, etc)
+    - Upto to 10 dimension per metric
+    - Metric have timestamps
+    - Can create CloudWatch dashboard of metric.
+  
+    Metric - 
+     CloudWatch EC2 detailed monitoring
+     - EC2 instance metrics have metrics "every 5 minutes"
+     - With detailed monitoring (for a cost), you get data "every 1 minute"
+     - Use detailed monitoring if you want to more prompt scale your ASG!
+
+     Note: EC2 Memory usage is by default not pushed (must be pushed from inside the instance as a custom metric). For this we use monitoring scrpits and that's the way to do it.
+
+     Custom Metric
+     - Possiblility to define and send your own custom metric to cloudWatch.
+     - Ability to use dimensions(attributes) to segment metric
+       - instance.id
+       - Environment.name
+    - Metric resolution:
+       - Standard: 1 minute
+       - High Resolution: up to 1 second (StorageResolution API parameter) - Higher cost
+    - Use API call PutMetricData
+    - Use exponetial back off incase of throttle errors.
+
+  
+    CloudWatch Dashboard
+    - Great way to setup dashboard for quick access to keys metric.
+    - Dashboard are global
+    - Dashboard can include graphs from different regions.
+    - You can change the time zone and time range of the dashboards.
+    - You can setup automatic refresh (10s, 1m, 15m)
+   
+    AWS CloudWatch Logs
+    - Applications can send logs to CloudWatch using the SDK
+    - CloudWatch can collect log from:
+      - Elastic Beanstalk: collection of logs from application
+      - ECS: collection from containers
+      - AWS Lambda: collection from function logs
+      - VPC Flow Logs: VPC specific logs
+      - API Gateway
+      - CloudTrail based on filter
+      - CloudWatch log agents: for example on EC2 machines
+      - Route53: Log DNS queries
+    - CloudWatch logs can go to:
+      - Batch exporter to S3 for archival
+      - Steam to ElasticSearch cluster for further analytics.
+    - Log storage architecture:
+      - Log group: arbitary name, usually representing an application
+      - Log stream: instance within application/ log files/  containers
+    - Can define log expiration policies (never expire, 30 days etcs)
+    - Using the AWS CLI we can tail the CloudWatch logs
+    - To send logs to CloudWatch, make sure IAM permissions are correct.
+    - Security: encryption of logs using KMS at Group level.
+    - CloudWatch Logs can use filter expersions
+     - For example , find a specific IP inside a log
+     - Metric filter can be used to trigger alarms.
+    - CloudWatch Logs Insight can be used to query logs and add queries to CloudWatch dashboard. (ex. for queries: 25 most recently added log events, etc.)
+
+    CloudWatch Logs for EC2
+    - By default, no logs from your EC2 machine will go to cloudWatch
+    - You need to run a cloudWatch agent on EC2 to push log files you want
+    - Make sure IAM permission are correct
+    - The cloudWatch logs agents can be setup on on-premises too
+
+     Two different agents in CloudWatch 
+
+     CloudWatch Logs Agent and Unified Agent
+    - Both For virtual servers (EC2 instances, on premisis servers)
+    - CloudWatch Logs Agent 
+       - Old version of the agent.
+       - Can only send to CloudWatch Logs
+    
+    - CloudWatch Unified Agent
+       - Collect additional system-level metric such as RAM, processes, etc
+       - collect logs to send to CloudWatch Logs
+       - Centralized configuration using SSM patameter store.
+
+     CloudWatch Unified Agent Metric
+      - Collected directly on your Linux server / EC2 instance.
+      - CPU (active, guest, idle, system, user, steal)
+      - Disk Metric (free, used, total) Disk IO (writes, reads, bytes and IOPS)
+      - RAM (free, inactive, used, total and cached)
+      - NetStat (number of TCP and UDP connections, net packets, bytes)
+      - Processes (total, dead, bloqued, idle, running, sleep)
+      - Swap Space (free, used, used %)
+
+      The CloudWatch Unified agent allow you to get much more metric at a lot more granular details than the normal monitoring for EC2 instance.
+       so as a reminder: out of the box metric for EC2 - disk, CPU, Network (high level), not swap size or memory details.
+
+     AWS CloudWatch Alarms
+      - Alarms are used to trigger notification for any metric.
+      - Alarms can go to Auto Scaling, EC2 Actions, SNS Notification.
+      - Various options to alarm (sampling % , max, min, etc)
+      - Alarm State:
+         - OK
+         - INSUFFICIENT_DATA
+         - ALARM
+      - Period:
+         - Lenght of time in seconds to evaluate the metric
+         - High resolution custom metrics: can only choose 10 sec or 30 sec.
+
+     AWS CloudWatch Events
+      - Schedule: Cron Jobs
+      - Event Pattern: Event rules to reach to a service doing something. ex. a codepipeline state changes
+      - Triggers to Lambda Functions, SQS, SNS, Kineis Messages
+      - CloudWatch Event create a small JSON document to give information about the change
+
+
+     AWS CloudTrail
+       - Provides governance. compliance and audit for your AWS Account
+       - CloudTrail is enabled by default!
+       - Get an history of events / API calls made within your AWS Account by:
+         - Console
+         - SDK
+         - CLI
+         - AWS Services
+       - Can put logs from CloudTrail into CloudWatch logs or S3
+       - A trail can be applied to all regions (default) or a single region
+       - if a resource is deleted in AWS, investicate CloudTrail first! to know who did what and when?
+
+     CloudTrail Event:
+
+      There are three types of Events you can see in CloudTrail
+       - Management Events:
+         - Operations that are perfromed on resources in your AWS account.
+         - Examples:
+           - Configuring security (IAM Attach_Role_Policy)
+           - Configuing rules for routing data (Amazon EC2 CreateSubnet)
+           - setting up logging (AWS CloudTrail CreateTrail)
+         - By default, trails are configured to log management events
+         - Can separate Read Event (that don't modify resources) from write event (which may modify resources)
+       - Data Events:
+          - By default, data events are not logged (because of high volume operations)
+          - Amazon S3 object-level activity (ex GetOject,DeleteObject, PutObject): can seprate Read and write events
+          - AWS Lambda funtion execution activity (the invoke API)
+      -  CloudTrail Insights:
+          - Enable CloudTrail insight to detect unusual activity in your account.
+            - inaccurate resource provisioning
+            - hitting service limits
+            - Brusts of AWS IAM actions
+            - Gaps in preodic maintaienance activity
+          - CloudTrail insights analyzes normal management event to create a baseline
+          - And then continuously analyzes write events to detect unusual pattern 
+       
+       - CloudTrail Event Retention
+           - Event are stored in for 90 days in CloudTrail
+           - To keep events beyond this period, log them to S3 or use Athena.
+
+        
+     AWS Config
+        - Help with Auditing and recording compliance of your AWS resources.
+        - Helps record configuration and changes over time.
+        - Posiblility of storing the configuration data to S3 (analyzed by Athena)
+        - Questions that can be solved by AWS config
+          - Is there unrestricted SSH access to my security groups?
+          - Do my buckets have any public access?
+          - How many ALB configuration changes over time?
+        - You can receive alerts (SNS Notificaiton) for any changes
+        - AWS Config is a per-region service
+        - Can be aggregated across regions and accounts.
+
+        Config Rules
+         - Can use AWS managed config rule (over 75)
+         - Can make custom config rules (must be defined in AWS Lambda)
+            - Evaluate if each EBS disk is of type gp2?
+            - Evaluate if each EC2 instance is t2.mirco
+         - Rules can be evaluated/ Trigged:
+            - For each config change
+            - And/ or : at regular time intervals
+            - Can trigger CloudWatch event if the rule is non-compliant (and chain with Lamba)
+         - Rules can have auto remediations:
+           - if a resource is non compliant, you can trigger an auto remedation.
+           - Ex. stop instance with non-approved tags
+         - AWS config Rules does not prevent actions from happening(no delay)
+
+
+      CloudWatch vs CloudTrail vs Config
+         
+         - CloudWatch
+           - Performance monitoring  (metric, CPU, network etc..) and Dashboards
+           - Events and Alerting
+           - Log Aggregation and Analysis
+        - CloudTrail
+           - Record API calls made within your Account by everyone
+           - Can define trails for specific resources
+           - Global Service
+        - Config
+           - Record configuration changes
+           - Evaluate resources againts compliance rule
+           - Get timeline of changes and compliance 
+
+         Ex for a Elastic Load Balancer service
+            CloudWatch
+             - Monitor incoming connection metric
+             - Visualize erros codes as a % over time
+             - Make a dashboard of get an idea of your load balancer perfromance.
+            Config:
+             - Track security group rules for the load balancer
+             - Track configuration changes for the load balancer
+             - Ensure an SSL certificate is always assigned to the Load Balancer (compliance)
+            CloudTrail:
+             - Track who made changes to the Load Balancer with API calls
+
+
+AWS Security
+============
+
+  Encryption 
+      
+       Encryption in flight - (SSL - )
+       - Data encrypted before sending and decrpyted after receiving.
+       - SSL certificate help with encrpytion (HTTPS)
+       - Encrpytion in flight ensures no MITM (man in the middle attack) can happen
+       
+       Server side encryption at rest
+       - Data is encrypted after being received by the server.
+       - Data is decrypted before being sent
+       - It is stored in an encrypted form thanks to a KEY (usually a data key)
+       - The encrpytion / decryption keys must be managed somewhere and the server must have access to it.
+
+       Client side encryption
+       - Data is encrypted by the client and never decrpyted by the server
+       - Data will be decrypted by a receving client.
+       - The server should not be able to decrypt the data.
+       - Cloud leverage Envelope Encryption.
+  
+  AWS KMS - Key Management Service
+  
+   - Anytime you here "encryption" for an AWS service, its most likely KMS
+   - Easy way to control access for your data, AWS manages keys for us.
+   - Fully integrated with IAM for authorization.
+   - Seamlessly integrated into:
+      - Amazon EBS: encrpted volume
+      - Amazon S3: Server side encryption of objects.
+      - Amazon Redshift: encrpytion of data
+      - Amazon RDS: Encrpytion of data
+      - Amazon SSM : patameter store
+      - Etc
+   - But you can also use the CLI/SDK
+
+      KMS Types:- 
+       - Symmetric (AES-256 Keys)
+         - First offering of KMS, single encrption key that is used to Encrypt and Decrypt
+         - AWS services that are integrated with KMS use Symmetric CMKs.
+         - Necessary for envelope encrpytion
+         - You never get access to the Key unencrypted (must call KMS API to use) (You never see the key)
+       - Asymmetric (RSA and ECC key pairs)
+         - Two keys: Public (Encrypt) and Private Key (Decrypt pair)
+         - Used for Encrypt/Decrypt, or sing/verify operations.
+         - The public key is downloadable, but you can't access the Private key unencrpyted.
+         - Use case: encryption outside of AWS by users who can't call KMS API.
+    
+    - Able to fully manage the keys and polices:
+       - Create
+       - Rotation polices
+       - Disable and Enable
+    - Able to audit key usage using CloudTrail 
+    - Three types of KMS Keys:
+      - AWS owned key or AWS Managed Service Default CMK: Free
+      - AWS managed key or User Keys created in KMS: $1 / Month
+      - Customer managed key or User Keys Imported (must be 256-bit symmetric key): $1/ month
+
+
+    - Anytime you need to share senitive information.. use KMS
+       - Database password
+       - Credential to extetnal services.
+       - Private Key of SSL certificates
+    - The Value  in KMS is that the CMK used to encrypt data can never be reterived by the user, and the CMK can be rotated for extra security.
+
+    - Never ever store your secrets in plaintext, especically in your code.
+    - Encrypted secrets can be storted in the code/ enviroment variables.
+    - KMS can only help in encrypting up to 4KB of data per call.
+    - if data > 4KB, Use envelop encrpytion.
+    - To give access to KMS to someone.
+      - Make sure the key policy allows the user.
+      - Make sure the IAM policy allows the API calls
+    - KMS keys are bound to speific region.
+       - so incase you need to copy a encrypted snapshot from one region to another you need to select the a new/existing key in the other region to re-encrypt the snapshot.
+    
+    KMS Key Policies
+     - Control access to KMS Keys. "Similar to S3 bucket policies"
+     - Difference: You cannot control access without them
+     - Default KMS Key Policy:
+       - Created if you don't provide a specific KMS key Policy.
+       - Complete access to the key to the root user = entire AWS Account.
+       - Gives access to IAM polices to the KMS keys
+     - Custom KMS key policy:
+       - Define users, roles that can access the KMS keys
+       - Define who can administer the key
+       - Useful for cross-account access of your KMS keys          
+
+
+    KMS Automatic Key Rotation.
+     - For Customer-managed CMK (not AWS managed CMK)
+     - if enabled: automation key rotation happens every 1 year
+     - Previos key is kept active so you decrypt old data.
+     - New Key has the same CMK ID (only the backing key is changed)
+
+    KMS Manual Key Rotation.
+     - When you want to rotate key every 90 days, 180 days, etc.
+     - New key has different CMK ID
+     - keep the previous key active so you can decrypt old data.
+     - Better to use aliases in this case (to hide the change of the key for the application)
+     - Good solution to rotate CMK that are not eligible for automatic rotation (like asymmetric CMK)
+
+ -  SSM Parameter Store:
+
+      - Secure storage for configuration and secrects
+      - Optional seamless encrpyption with KMS
+      - Serverless, scalable, durable, easy SDK
+      - Version tracking of configurations / secrets
+      - Configuration management using path and IAM
+      - Notification with CloudWatch Events
+      - Intergration with CloudFormation.
+
+      SSM parameter hirarecy
+       /mydepartement/
+        /myapp/
+         /dev/
+          db-url
+          db-password
+         /prod/
+          db-url
+          db-password
+        /other-app/
+      /anotherdepartement/
+
+      Two tiers of parameter store: standard and Advanced 
+
+       Advanced parameter tires come with Parameter store policies.
+      
+      Parameter Policies (for advanced parameters)
+      - Allow to assign a TTL to a parameter (expiration date) to force updating or deleting senstive data such as password.
+      - Can assign multiple policies at a time. 
+        Ex. Expiration (to delete a parameter), ExpirationNotification (send notification 15 days before the expiratoin date) and NoChangeNotification (if parameter not changed within 60 days send me notification) 
+        The notification can be sent via CW events.
+        These types of policies you can assign to a parameter to force deletion or updation of a parameter.
+
+
+
+    AWS Secrets Manager
+    
+      - Newer service, meant for storing secrects.
+      - Capability to force rotation of secrects every x days.
+      - Automate generation of secrets on roation using Lambda.
+      - Integration with Amazon RDS (mysql, postgresSQL, Aurora)
+      - Secrects are encrpyted using KMS
+      - Mostly meant for RDS integration.
+
+
+
+    Diff b/w Parameter store and AWS Secrects Manager
+       AWS Secrets Manager
+
+     - AWS Secrects manager have the capability to force rotation of secrects every x days.
+     - Also capability to automate generation of secrets on roation using Lambda.
+     - Integration with Amazon RDS 
+     - Mostly meant for RDS integration.
+
+      Parameter store
+      - Secure storage for configuration and secrects
+      - Optional seamless encrpyption with KMS
+      - You can rotate secrects using Parameter polices but you need to use Adavanced tier for that.
+      - No automation support for auto generate or update secrets
+    
+
+    AWS Shield: To protect yourself for DDoS attack (distributed denial-of-service attacks)
+     - AWS Shield Standard:
+       - Free service that is activated for every AWS Customer
+       - Provide protection from attack such as SYN/UDP floods, Reflection attacks and other layer 3/4 attacts
+     - AWS Shield Advanced:
+       - Optional DDos mitigation service (3000$ per month per organization)
+       - Protect againts more sophisticated attack on Amazon EC2, ELB, CloudFront, Global Accelerator and Route53
+       - 24/7 access to AWS DDoS responce team (DRP)
+       - Protect againts higher fees during usage spike due to DDoS.
+    
+    AWS WAF - Web Application Firewall
+      - Protect your web application from common web expolits (Layer 7)
+      - Layer 7 is HTTP (vs layer 4 is TCP)
+      - Deploy on ALB, API Gateway and CloudFront.
+      
+      - Define WEB ACL (Web Access Control List)
+        - Rules can include: IP address, HTTP headers, HTTP body, or URI string.
+        - Protects from common attack - SQL injection and cross-site scripting (XSS)
+        - Size Constraints, geo-match(block countries)
+        - Rate-based rules (to count occurance of event) - for DDoS protection.
+
+
+    AWS Firewall Manager
+      - Manage rules in all account of an AWS Organization.
+
+      Common set of security rules
+      - WAF rules (ALB, API Gateway, CloudFront)
+      - AWS Shield Advanced (ALB, CLB, Elastic IP, CloudFront)
+      - Security Groups for EC2 and ENI resources in VPC
+      
+      
+
+
+AWS VPC  
+========
+     - Amazon Virtual Private Cloud
+     -
